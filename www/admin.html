@@ -1,0 +1,11 @@
+﻿{% extends "basepage.html" %}
+{% autoescape None %}
+
+{%block title%}Admin Page{%end%}
+{%block extraheaders%}<script src="static\teampage.js"></script>{%end%}
+
+{%block contents %}
+
+{{answerList()}}
+
+{%end%}

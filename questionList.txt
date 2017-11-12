@@ -1,0 +1,30 @@
+[
+	{
+		"name": "Q1",
+		"question": "What is 1+1?",
+		"score": 10,
+		"hintCost": 2,
+		"answers": [
+			"2",
+			"a window"
+		],
+		"hints": [
+			"Use a calculator",
+			"1 less than 3"
+		]
+	},
+	{
+		"name": "Q2",
+		"question": "What is 2*2?",
+		"score": 10,
+		"hintCost": 2,
+		"answers": [
+			"4",
+			"four"
+		],
+		"hints": [
+			"hint 2.1",
+			"hint 2.2"
+		]
+	}
+]

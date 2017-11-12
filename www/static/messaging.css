@@ -1,0 +1,11 @@
+
+#messageLog {
+    height:3.6em;
+    line-height: 1.2em;
+    overflow-y:auto;
+}
+
+#messageLog .errorMessage {
+    color: red;
+    font-weight: bold;
+}
