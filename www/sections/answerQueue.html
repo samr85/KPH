@@ -1,0 +1,24 @@
+{% autoescape None %}
+<div id="answerQueue{{answer.id}}">
+    Team: {{answer.team.name}}<br />
+    Question: {{answer.question.name}}<br />
+    Submitted answer: {{answer.answer}}<br />
+    {%set answers = answer.question.answers %}
+    Correct answers: {{", ".join(answers)}}
+    {# Do we expect the answer to be correct?#}
+    {%if answer.answer.lower() in answers%}
+      {%set correct = "Correct"%}
+      {%set incorrect = "Incorrect"%}
+    {%else%}
+      {%set correct = "Incorrect"%}
+      {%set incorrect = "Correct"%}
+    {%end%}
+    <form id="F{{answer.id}}">
+        <input type="hidden" id="teamName{{answer.id}}" value="{{answer.team.name}}" />
+        <input type="hidden" id="questionName{{answer.id}}" value="{{answer.question.name}}" />
+        <input type="hidden" id="correct{{answer.id}}" value="{{correct}}" />
+        <input type="checkbox" id="override{{answer.id}}" />Override expected answer<br />
+        <button onclick="mark('{{answer.id}}', 'Correct'); return false;" class="mark{{correct}}">Correct</button><br />
+        <button onclick="mark('{{answer.id}}', 'Incorrect'); return false;" class="mark{{incorrect}}">Incorrect</button><br />
+    </form>
+</div>

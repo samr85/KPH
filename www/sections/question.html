@@ -1,0 +1,40 @@
+{%autoescape None%}
+{%set question = answer.question%}
+
+<div class="question">
+    <div class="questionName">Question: {{question.name}}</div>
+    <div class="questionDescription">{{question.question}}</div>
+</div>
+<div class="answer">
+    {%if answer.correct()%}
+    <div class="answerCorrect">Correct answer submitted: {{answer.answer}}</div>
+    {%end%}
+    <div class="hints">
+        {%for hint in question.hints[:answer.hintCount]%}
+        <div class="hintText">{{hint["hint"]}}</div>
+        {%end%}
+        {%if answer.canRequestHint()%}
+        <div class="hintRequest">
+            Score reduction for solving this question if you request another hint: {{question.hints[answer.hintCount]["cost"]}} 
+            <button onclick="requestHint('{{question.name}}');">Request Hint</button>
+        </div>
+        {%end%}
+    </div>
+    {%if answer.previousAnswers %}
+    <div class="previousAnswers">
+        Previously submitted incorrect answers: <br />
+        {{ ", ".join(answer.previousAnswers)}}
+    </div>
+    {%end%}
+    {%if answer.awaitingAnswer()%}
+    <div class="submittedAnswer">
+        Submitted answer awaiting marking: {{answer.answer}}
+    </div>
+    {%elif answer.canSubmitAnswer()%}
+    <div class="answerRequest">
+        <div id="{{question.name}}Err"></div>
+        <input id="{{question.name}}Answer" type="text" name="" />
+        <button onclick="submitAnswer('{{question.name}}')">Submit answer</button>
+    </div>
+    {%end%}
+</div>

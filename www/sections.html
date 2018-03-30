@@ -1,0 +1,15 @@
+{% extends "basepage.html" %}
+{% autoescape None %}
+
+{%block title%}{{ pageTitle }}{%end%}
+{%block extraheaders%}
+<script src="static\teampage.js"></script>
+<link type="text/css" rel="stylesheet" href="static\team.css" />
+{%end%}
+
+{%block contents %}
+
+<div id="questionList">
+</div>
+
+{%end%}

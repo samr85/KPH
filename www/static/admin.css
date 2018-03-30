@@ -1,0 +1,10 @@
+
+.markIncorrect
+{
+    color: red;
+}
+.markCorrect
+{
+    font-weight: bold;
+    color: green;
+}

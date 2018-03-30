@@ -9,8 +9,14 @@
 			"a window"
 		],
 		"hints": [
-			"Use a calculator",
-			"1 less than 3"
+			{
+			    "hint": "Use a calculator",
+				"cost": 2
+			},
+			{
+				"hint": "1 less than 3",
+				"cost": 5
+			}
 		]
 	},
 	{
@@ -23,8 +29,14 @@
 			"four"
 		],
 		"hints": [
-			"hint 2.1",
-			"hint 2.2"
+			{
+			    "hint": "<b>hint 2.1</b>",
+				"cost": 1
+			},
+			{
+				"hint": "hint 2.2",
+				"cost": 1
+			}
 		]
 	}
 ]
