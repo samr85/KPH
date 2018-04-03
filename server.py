@@ -83,23 +83,6 @@ class teamPage(teamRequestHandler):
     def getTeam(self):
         self.render("www\\sections.html", answers=self.team.questionAnswers.values(), pageTitle="Team %s"%(self.team.name))
 
-class answerRequestUNUSED(teamRequestHandler):
-    def getTeam(self, regExGroup):
-        #qNo = self.get_query_arguments("q")
-        #if (len(qNo) != 1):
-        #    raise tornado.web.HTTPError(400)
-        #print("qNo: %s"%(qNo[0]))
-        try:
-            qNo = int(regExGroup)
-        except ValueError:
-            raise tornado.web.HTTPError(400)
-        print("qNo: %d"%(qNo))
-        for answer in self.team.questionAnswers.values():
-            if answer.question.id == qNo:
-                self.render("www\\teamQuestionListSection.html", answer = answer)
-                return
-        raise tornado.web.HTTPError(404)
-
 class adminRequestHandler(tornado.web.RequestHandler):
     def get(self, *args, **kwargs):
         admin = self.get_secure_cookie("admin", None)

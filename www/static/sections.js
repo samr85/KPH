@@ -17,13 +17,14 @@ update section request - requests the above, sent for each section with the wron
 [type, id]
 */
 
-sectionTypes = {}
+sectionTypes = new Map()
 
 class SectionType {
     constructor(name, updateFunction) {
         this.name = name;
         this.update = updateFunction;
-        this.idList = {};  //List of id->version
+        this.idList = [];    //List of id->version
+        this.oldIdList = []; //A list to be used while updating to ensure that old entries that shouldn't exist any more are removed
     }
 }
 
@@ -36,12 +37,16 @@ class SectionHolder {
             throw "Invalid msglist - NaN!" + msgList.join(" ");
         }
 
-        if (typeName in sectionTypes) {
-            this.thisType = sectionTypes[typeName];
+        if (sectionTypes.has(typeName)) {
+            this.thisType = sectionTypes.get(typeName);
             this.idList = this.thisType.idList;
         }
         else {
             throw "Unknown section type: " + typeName;
+        }
+        /* was this ID know about before? */
+        if (this.id in this.thisType.oldIdList) {
+            delete this.thisType.oldIdList[this.id]
         }
     }
 
@@ -58,7 +63,7 @@ class SectionHolder {
 }
 
 function requestSections() {
-    requestUpdateSectionList(Object.keys(sectionTypes));
+    requestUpdateSectionList(Array.from(sectionTypes.keys()));
 }
 
 function requestUpdateSectionList(typeNames) {
@@ -71,6 +76,10 @@ function updateSectionListHandler(msg)
 {
     //Messages of format: [[type, id, version]]
     var msgList = msg.split(" ");
+    if (msgList.length === 1) {
+        // an empty string still comes out with an array of 1 entry...
+        msgList.shift();
+    }
     if (msgList.length % 3)
     {
         if (msgList.length == 1)
@@ -80,11 +89,24 @@ function updateSectionListHandler(msg)
         }
         throw "invalid seciton list - not multiple of 3 entries!" + msg;
     }
+
+    sectionTypes.forEach(function (st) {
+        st.oldIdList = st.idList.slice()
+        console.log("Created oldIdList for:")
+        console.log(st)
+    });
     while (msgList.length)
     {
         var section = new SectionHolder(msgList);
         section.checkForUpdates();
     }
+    /*Remove no longer existing sections*/
+    sectionTypes.forEach(function (st) {
+        Object.keys(st.oldIdList).forEach(function (badId) {
+            console.log("Removing old section: " + st.name + " " + badId)
+            st.update(badId, "");
+        });
+    });
 }
 
 function requestUpdateSection(typeName, id)
@@ -139,54 +161,9 @@ function initialiseSection(sectionName, updateFunction, initialMessages)
 {
     console.log("Registering for section: " + sectionName)
     var section = new SectionType(sectionName, updateFunction);
-    sectionTypes[sectionName] = section;
+    sectionTypes.set(sectionName, section);
     initialMessages.forEach(function (message) {
         section.update(message["contents"]);
         section.idList[message["id"]] = message["version"];
     });
 }
-
-/*
-function sectionListHandler(msg)
-{
-    var newIds = msg.split(" ");
-    // First element is the name, rest are the IDs
-    var sectionName = newIds.shift();
-    sec = sectionList[sectionName]
-    if (sec == undefined)
-    {
-        logError("section: " + sectionName + " not on page!");
-        return;
-    }
-    var removed = sec.ids;
-    console.log("Old list: " + sec.ids + "\nNew list: " + newIds)
-    added = newIds.filter(function (entry) {
-        idx = removed.indexOf(entry) 
-        if (idx >= 0) {
-            removed = removed.splice(idx, 1);
-            return false;
-        }
-    });
-    sec.ids = newIds;
-    removed.forEach(sec.removeEntry)
-    added.forEach(sec.addEntry)
-}
-
-function sectionRefreshHandler(msg) {
-    var Ids = msg.split(" ");
-    // First element is the name, rest are the IDs
-    var sectionName = newIds.shift();
-    sec = sectionList[sectionName]
-    if (sec == undefined) {
-        logError("section: " + sectionName + " not on page!");
-        return;
-    }
-    Ids.forEach(sec.addEntry)
-}
-
-function requestSections() {
-    for (sectionName in sectionList) {
-        sendMessage("requestSection " + sectionName)
-    }
-}
-*/
