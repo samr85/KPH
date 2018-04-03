@@ -10,8 +10,7 @@
 		],
 		"hints": [
 			{
-			    "hint": "Use a calculator",
-				"cost": 2
+			    "hint": "Use a calculator"
 			},
 			{
 				"hint": "1 less than 3",
