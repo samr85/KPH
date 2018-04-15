@@ -85,10 +85,3 @@ def submitAnswer(server, messageList):
 @handleCommand("reqHint", 1, teamRequired=True)
 def reqHint(server, messageList):
     server.team.requestHint(messageList[0])
-
-@handleCommand("markAnswer", 3, adminRequired=True)
-def markAnswer(server, messageList):
-    # TODO: do this better!
-    from answers import answerQueue
-    answerQueue.markAnswer(messageList[0], messageList[1], messageList[2].lower() == "correct")
-    server.sendRefresh()

@@ -17,6 +17,9 @@ class Question:
                 hasattr(self, "answers") and
                 hasattr(self, "hints")):
             raise ValueError("Invalid question dictionary: %s"%(dictionary))
+        for hint in self.hints:
+            if "cost" not in hint:
+                hint["cost"] = self.hintCost
         self.id = Question.nextId
         Question.nextId += 1
         # TODO: Check dictionary loaded right!

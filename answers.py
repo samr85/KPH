@@ -28,6 +28,7 @@ class Answer:
         self.answer = ""
         self.answeredTime = datetime.datetime.now() 
         self.version = 1
+        self.score = 0
 
     def correct(self):
         return self.status == CORRECT
@@ -57,10 +58,14 @@ class Answer:
         else:
             raise ErrorMessage("Can't submit an answer to an already answered question!")
 
-    def mark(self, mark):
+    def mark(self, mark, score):
         if mark:
             self.status = CORRECT
             self.team.notifyTeam("%s answer: CORRECT!"%(self.question.name), refreshAnswer = self)
+            if score == 0:
+                self.score = self.question.score
+            else:
+                self.score = score
         else:
             self.status = INCORRECT
             self.team.notifyTeam("%s answer: INCORRECT :("%(self.question.name), refreshAnswer = self)
@@ -91,7 +96,14 @@ class Answer:
 
     def getScore(self):
         if self.status == CORRECT:
-            return self.question.score - self.question.hintCost * self.hintCount
+            hintCost = 0
+            for hintNo in range(self.hintCount):
+                if "cost" in self.question.hints[hintNo]:
+                    hintCost += self.question.hints[hintNo]["cost"]
+                else:
+                    hintCost += self.question.hintCosts
+            if self.score > hintCost:
+                return self.score - hintCost
         return 0
 
 class AnswerSubmissionQueue:
@@ -107,7 +119,7 @@ class AnswerSubmissionQueue:
                     raise ErrorMessage("Cannot submit another answer until your previous one has been marked (answer: %s pending for question: %s)" % (answer.answer, answer.question.name))
             self.answerList.append(newAnswer)
 
-    def markAnswer(self, teamName, questionName, mark):
+    def markAnswer(self, teamName, questionName, mark, value = 0):
         found = False
         with self.lock:
             for answer in self.answerList:
@@ -118,7 +130,7 @@ class AnswerSubmissionQueue:
         if found:
             # Can't lock team while we have the answerSubQueue lock
             with answer.team.lock:
-                answer.mark(mark)
+                answer.mark(mark, value)
         else:
             raise ErrorMessage("Answer not found to mark!")
 
