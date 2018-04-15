@@ -1,4 +1,4 @@
-import answers 
+import answers
 from messageHandler import handleCommand
 from globalItems import ErrorMessage
 
@@ -10,16 +10,18 @@ class AdminList:
         for client in self.messagingClients:
             client.write_message(message)
 
-    def renderAnswerQueue(self, answerId):
+    @staticmethod
+    def renderAnswerQueue(answerId):
         return answers.answerQueue.renderEntry(answerId)
 
-    def getAnswerQueueEntries(self):
+    @staticmethod
+    def getAnswerQueueEntries():
         return answers.answerQueue.getEntries()
 
 adminList = AdminList()
 
 @handleCommand("markAnswer", adminRequired=True)
-def markAnswer(server, messageList):
+def markAnswer(_server, messageList, _time):
     # messageList = teamName questionName correct/incorrect [mark]
     if len(messageList) == 3:
         answers.answerQueue.markAnswer(messageList[0], messageList[1], messageList[2].lower() == "correct", 0)

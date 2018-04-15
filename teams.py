@@ -5,6 +5,7 @@ import collections
 from answers import Answer, answerQueue
 from questions import questionList
 from globalItems import ErrorMessage, startTime
+from messageHandler import handleMessage
 
 class Team:
     def __init__(self, name):
@@ -12,24 +13,25 @@ class Team:
         self.questionAnswers = {}
         self.messages = []
         self.lock = RLock()
-        for name, question in questionList.questionList.items():
-            self.questionAnswers[name] = Answer(question, self)
+        for qName, question in questionList.questionList.items():
+            self.questionAnswers[qName] = Answer(question, self)
         self.messagingClients = []
 
-    def notifyTeam(self, message, refreshAnswer = None):
+    def notifyTeam(self, message):
         self.messages.append(message)
         for client in self.messagingClients:
             client.write_message(message)
 
     def sendAllNotifications(self, client):
+        # TODO: this looks bad
         for message in self.messages:
             client.write_message(message)
 
-    def submitAnswer(self, question, answer):
+    def submitAnswer(self, question, answer, time):
         if question not in self.questionAnswers:
             raise ErrorMessage("Team does not have access to question: %s"%(question))
         answerItem = self.questionAnswers[question]
-        answerItem.submitAnswer(answer)
+        answerItem.submitAnswer(answer, time)
         self.notifyTeam("Answer %s submitted for question %s"%(answer, question))
 
     def requestHint(self, question):
@@ -75,7 +77,7 @@ class Team:
 def datetimeToJsString(dt):
     return  str(tuple([i for i in dt.timetuple()][:6]))
 
-class teamScore:
+class TeamScore:
     def __init__(self, team):
         self.name = team.name
         self.time, self.score = team.getScore()
@@ -102,9 +104,9 @@ class TeamList:
                 raise ErrorMessage("Team %s doesn't exist!"%(name))
 
     def getScoreList(self):
-        scores = [teamScore(team) for team in self.teamList.values()]
+        scores = [TeamScore(team) for team in self.teamList.values()]
         dtnow = datetime.datetime.now()
-        #Sorting is wrong!!!
+        #TODO: Sorting is wrong!!!
         return sorted(scores, key=lambda teamS: (teamS.score, dtnow - teamS.time), reverse=True)
 
     def getScoreHistory(self):
@@ -114,3 +116,9 @@ class TeamList:
         return scoreHistory
 
 teamList = TeamList()
+
+# TODO: This function needs to be locked down!
+@handleCommand("createTeam", 1)
+def createTeam(server, messageList, _time):
+    from teams import teamList
+    server.team = teamList.createTeam(messageList[0])

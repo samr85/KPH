@@ -1,15 +1,18 @@
 import base64
+import abc
 from messageHandler import handleCommand
 
-class SectionHandler:
+class SectionHandler(abc.ABC):
     def __init__(self):
         self.requireTeam = False
         self.requireAdmin = False
 
+    @abc.abstractmethod
     def requestUpdateList(self, server):
         #return [(id, version), ...]
         return []
 
+    @abc.abstractmethod
     def requestSection(self, server, sectionId):
         #return (version, content)
         return None
@@ -43,12 +46,12 @@ def pushSection(servers, section, sectionId):
     if not html:
         html = b''
     for server in servers:
-        server.write_message("updateSection %s %s %s %s"%(section, sectionId, version, 
+        server.write_message("updateSection %s %s %s %s"%(section, sectionId, version,
                                                           base64.b64encode(html).decode()))
 
 
-@handleCommand("UpdateSectionListRequest")
-def updateSectionListRequest(server, messageList):
+@handleCommand("UpdateSectionListRequest", logMessage=False)
+def updateSectionListRequest(server, messageList, _time):
     # [type]
     try:
         sectionList = []
@@ -60,24 +63,23 @@ def updateSectionListRequest(server, messageList):
                     raise InvalidRequest("id, version list not valid!!: %s"%(" ".join(str(entryItem) for entryItem in entry)))
                 sectionList.append(sectionReq + " " + " ".join(str(entryItem) for entryItem in entry))
         server.write_message("updateSectionList " + " ".join(sectionList))
-    except InvalidRequest as e:
-        server.write_message("error " + str(e))
+    except InvalidRequest as ex:
+        server.write_message("error " + str(ex))
 
-@handleCommand("UpdateSectionRequest", 2)
-def updateSectionRequest(server, messageList):
+@handleCommand("UpdateSectionRequest", 2, logMessage=False)
+def updateSectionRequest(server, messageList, _unusedTime):
     # type, id
     try:
-        sectionList = []
         sectionReq = messageList[0]
         sectionId = messageList[1]
         sectionReqHandler = getSectionHandler(sectionReq, server)
         (version, html) = sectionReqHandler.requestSection(server, sectionId)
         if not html:
             html = b''
-        server.write_message("updateSection %s %s %s %s"%(sectionReq, sectionId, version, 
+        server.write_message("updateSection %s %s %s %s"%(sectionReq, sectionId, version,
                                                           base64.b64encode(html).decode()))
-    except InvalidRequest as e:
-        server.write_message("error " + str(e))
+    except InvalidRequest as ex:
+        server.write_message("error " + str(ex))
 
 @registerSectionHandler("question")
 class QuestionSectionHandler(SectionHandler):
