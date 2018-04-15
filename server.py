@@ -1,5 +1,7 @@
 import threading
 import os.path
+import argparse
+import datetime
 import tornado.web
 import tornado.websocket
 
@@ -7,8 +9,6 @@ from globalItems import ErrorMessage, startTime
 import messageHandler
 from teams import teamList
 from admin import adminList
-
-templateLoader = tornado.template.Loader("www")
 
 class WSHandler(tornado.websocket.WebSocketHandler):
     def __init__(self, *args, **kwargs):
@@ -47,21 +47,25 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         print('MSG Rx: ' + message)
         try:
             messageHandler.handleMessage(self, message)
-        except ErrorMessage as e:
-            self.write_message("Error: %s"%(e.message))
+        except ErrorMessage as ex:
+            self.write_message("Error: %s"%(ex.message))
 
     def on_close(self):
         messageHandler.clients.removeClient(self)
         print('connection closed.')
 
-    def write_message(self, message, binary = False):
+    def write_message(self, message, binary=False):
         print("MSG Tx: " + message)
         return super().write_message(message, binary)
 
     def sendRefresh(self):
         self.write_message("js: location.reload();")
 
-class teamRequestHandler(tornado.web.RequestHandler):
+class TeamRequestHandler(tornado.web.RequestHandler):
+    def __init__(self, application, request, **kwargs):
+        super().__init__(application, request, **kwargs)
+        self.team = None
+
     def get(self, *args, **kwargs):
         teamName = self.get_secure_cookie("team")
         if not teamName:
@@ -79,11 +83,11 @@ class teamRequestHandler(tornado.web.RequestHandler):
     def getTeam(self):
         raise NotImplementedError("This function should have been overloaded!! " + self.request)
 
-class teamPage(teamRequestHandler):
+class TeamPage(TeamRequestHandler):
     def getTeam(self):
         self.render("www\\sections.html", answers=self.team.questionAnswers.values(), pageTitle="Team %s"%(self.team.name))
 
-class adminRequestHandler(tornado.web.RequestHandler):
+class AdminRequestHandler(tornado.web.RequestHandler):
     def get(self, *args, **kwargs):
         admin = self.get_secure_cookie("admin", None)
         if not admin:
@@ -93,19 +97,19 @@ class adminRequestHandler(tornado.web.RequestHandler):
     def getAdmin(self):
         raise NotImplementedError("This function should have been overloaded!! " + self.request)
 
-class adminPage(adminRequestHandler):
+class AdminPage(AdminRequestHandler):
     def getAdmin(self):
         self.render("www\\admin.html")
 
-class scorePage(tornado.web.RequestHandler):
+class ScorePage(tornado.web.RequestHandler):
     def get(self):
-        self.render("www\\score.html", teamScoreList = teamList.getScoreList(), teamScoreHistory = teamList.getScoreHistory(), startTime=startTime)
+        self.render("www\\score.html", teamScoreList=teamList.getScoreList(), teamScoreHistory=teamList.getScoreHistory(), startTime=startTime)
 
-class login(tornado.web.RequestHandler):
+class Login(tornado.web.RequestHandler):
     def get(self):
         self.clear_cookie("team")
         self.clear_cookie("admin")
-        self.render("www\\login.html", getTeamQuickLogin=self.getTeamQuickLogin, Errors = [])
+        self.render("www\\login.html", getTeamQuickLogin=self.getTeamQuickLogin, Errors=[])
 
     def getTeamQuickLogin(self):
         retHTML = ""
@@ -126,7 +130,7 @@ class login(tornado.web.RequestHandler):
             elif (self.get_argument("createTeam", None)):
                 teamName = self.get_argument("teamName")
                 # Excepts on error
-                teamList.createTeam(teamName)
+                messageHandler.sendDummyMessage("createTeam", [teamName])
                 self.set_secure_cookie("team", teamName)
                 self.redirect("\\teampage")
                 return
@@ -135,44 +139,61 @@ class login(tornado.web.RequestHandler):
                 if teamName in teamList.teamList:
                     self.set_secure_cookie("team", teamName)
                     self.redirect("\\teampage")
-                    return 
+                    return
                 errorMessages.append("Unknown team: %s"%(teamName))
             elif (self.get_argument("admin", None)):
                 self.set_secure_cookie("admin", "1")
                 self.redirect("\\admin")
                 return
-        except ErrorMessage as e:
-            errorMessages.append(e.message)
-        self.render("www\\login.html", getTeamQuickLogin=self.getTeamQuickLogin, Errors = errorMessages)
+        except ErrorMessage as ex:
+            errorMessages.append(ex.message)
+        self.render("www\\login.html", getTeamQuickLogin=self.getTeamQuickLogin, Errors=errorMessages)
 
 
 def startServer():
-    server_thread = threading.Thread(target=tornado.ioloop.IOLoop.instance().start)
+    serverThread = threading.Thread(target=tornado.ioloop.IOLoop.instance().start)
     # Exit the server thread when the main thread terminates
-    server_thread.daemon = True
-    server_thread.start()
+    serverThread.daemon = True
+    serverThread.start()
 
-if __name__ == "__main__":
-    settings={
+def initilise():
+    parser = argparse.ArgumentParser(description="Runs KPH webserver")
+    parser.add_argument("--reloadMessages", "-r", type=argparse.FileType("r"), help="Reload the messages from specified file")
+    # Open mode of x means fail if the file already exists
+    parser.add_argument("--messageFile", "-m", type=argparse.FileType("x"), nargs='?',
+                        default="messages\\%s.txt"%(datetime.datetime.now().strftime("%Y%m%dT%H%M%S")),
+                        help="Save messages to specified file.  Default: messages.%s.txt"%
+                        (datetime.datetime.now().strftime("%Y%m%dT%H%M%S")))
+    parser.add_argument("--port", "-p", type=int, default=9092, help="Port to listen on, default: 9092")
+    args = parser.parse_args()
+
+    messageHandler.setMessageFile(args.messageFile)
+    if args.reloadMessages:
+        messageHandler.importMessages(args.reloadMessages)
+
+    settings = {
         "debug": True,
         "static_path": os.path.join(os.path.dirname(__file__), "www\\static"),
         "cookie_secret": "123",
-        "autoreload": False 
+        "autoreload": False
         }
     application = tornado.web.Application([
-        (r"/", login),
+        (r"/", Login),
         (r"/ws", WSHandler),
-        (r"/login", login),
-        (r"/teampage", teamPage),
-        (r"/admin", adminPage),
-        (r"/score", scorePage)
+        (r"/login", Login),
+        (r"/teampage", TeamPage),
+        (r"/admin", AdminPage),
+        (r"/score", ScorePage)
         ], **settings)
-    application.listen(9092)
+    application.listen(args.port)
 
     startServer()
     import readline
-    import rlcompleter
+    import rlcompleter #pylint: disable=unused-variable
     import code
     readline.parse_and_bind("tab: complete")
     code.interact(local=locals())
     tornado.ioloop.IOLoop.instance().stop()
+
+if __name__ == "__main__":
+    initilise()

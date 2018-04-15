@@ -26,7 +26,7 @@ class Answer:
         self.previousAnswers = []
         self.hintCount = 0
         self.answer = ""
-        self.answeredTime = datetime.datetime.now() 
+        self.answeredTime = datetime.datetime.now()
         self.version = 1
         self.score = 0
 
@@ -48,12 +48,15 @@ class Answer:
         sections.pushSection(self.team.messagingClients, "question", self.question.name)
         sections.pushSection(admin.adminList.messagingClients, "answerQueue", self.id)
 
-    def submitAnswer(self, answer):
+    def submitAnswer(self, answer, time):
         if self.status == INCORRECT:
             self.answer = answer
             answerQueue.queueAnswer(self)
             self.status = SUBMITTED
-            self.answeredTime = datetime.datetime.now()
+            if time:
+                self.answeredTime = time
+            else:
+                self.answeredTime = datetime.datetime.now()
             self.update()
         else:
             raise ErrorMessage("Can't submit an answer to an already answered question!")
@@ -61,14 +64,14 @@ class Answer:
     def mark(self, mark, score):
         if mark:
             self.status = CORRECT
-            self.team.notifyTeam("%s answer: CORRECT!"%(self.question.name), refreshAnswer = self)
+            self.team.notifyTeam("%s answer: CORRECT!"%(self.question.name))
             if score == 0:
                 self.score = self.question.score
             else:
                 self.score = score
         else:
             self.status = INCORRECT
-            self.team.notifyTeam("%s answer: INCORRECT :("%(self.question.name), refreshAnswer = self)
+            self.team.notifyTeam("%s answer: INCORRECT :("%(self.question.name))
             self.previousAnswers.append(self.answer)
         self.update()
 
@@ -82,9 +85,8 @@ class Answer:
             version = self.version
             html = SECTION_LOADER.load("answerQueue.html").generate(answer=self)
             return (version, html)
-        else:
-            print("ERROR: requesting admin answer for one that isn't awaiting an answer")
-            return (self.version, None)
+        print("ERROR: requesting admin answer for one that isn't awaiting an answer")
+        return (self.version, None)
 
     def requestHint(self):
         if self.hintCount < len(self.question.hints):
@@ -108,7 +110,7 @@ class Answer:
 
 class AnswerSubmissionQueue:
     answerList = collections.deque()
-    
+
     def __init__(self):
         self.lock = Lock()
 
@@ -119,18 +121,18 @@ class AnswerSubmissionQueue:
                     raise ErrorMessage("Cannot submit another answer until your previous one has been marked (answer: %s pending for question: %s)" % (answer.answer, answer.question.name))
             self.answerList.append(newAnswer)
 
-    def markAnswer(self, teamName, questionName, mark, value = 0):
+    def markAnswer(self, teamName, questionName, mark, value=0):
         found = False
         with self.lock:
             for answer in self.answerList:
                 if answer.team.name == teamName and answer.question.name == questionName:
                     found = answer
                     self.answerList.remove(answer)
-                    break;
+                    break
         if found:
             # Can't lock team while we have the answerSubQueue lock
-            with answer.team.lock:
-                answer.mark(mark, value)
+            with found.team.lock:
+                found.mark(mark, value)
         else:
             raise ErrorMessage("Answer not found to mark!")
 
