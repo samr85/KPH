@@ -2,10 +2,8 @@ from threading import RLock, Lock
 import datetime
 import collections
 
-from answers import Answer, answerQueue
-from questions import questionList
 from globalItems import ErrorMessage, startTime
-from messageHandler import handleMessage
+from commandRegistrar import handleCommand
 
 class Team:
     def __init__(self, name):
@@ -13,8 +11,8 @@ class Team:
         self.questionAnswers = {}
         self.messages = []
         self.lock = RLock()
-        for qName, question in questionList.questionList.items():
-            self.questionAnswers[qName] = Answer(question, self)
+        #for qName, question in questionList.questionList.items():
+        #    self.questionAnswers[qName] = Answer(question, self)
         self.messagingClients = []
 
     def notifyTeam(self, message):
@@ -38,12 +36,6 @@ class Team:
         if question not in self.questionAnswers:
             raise ErrorMessage("Team does not have access to question: %s"%(question))
         self.questionAnswers[question].requestHint()
-
-    def allowedToSubmitAnswer(self):
-        for answer in answerQueue.answerList:
-            if answer.team == self:
-                return False
-        return True
 
     def getScore(self):
         score = 0
@@ -115,10 +107,6 @@ class TeamList:
             scoreHistory[teamName] = self.teamList[teamName].getScoreHistory()
         return scoreHistory
 
-teamList = TeamList()
-
-# TODO: This function needs to be locked down!
 @handleCommand("createTeam", 1)
 def createTeam(server, messageList, _time):
-    from teams import teamList
-    server.team = teamList.createTeam(messageList[0])
+    server.team = CTX.teams.createTeam(messageList[0])

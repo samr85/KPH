@@ -1,5 +1,5 @@
 import answers
-from messageHandler import handleCommand
+from commandRegistrar import handleCommand
 from globalItems import ErrorMessage
 
 class AdminList:

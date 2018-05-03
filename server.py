@@ -7,7 +7,9 @@ import tornado.websocket
 
 from globalItems import ErrorMessage, startTime
 import messageHandler
-from teams import teamList
+import commandRegistrar
+import huntSpecific
+from controller import CTX
 from admin import adminList
 
 class WSHandler(tornado.websocket.WebSocketHandler):
@@ -22,8 +24,8 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         teamName = self.get_secure_cookie("team", None)
         if teamName:
             teamName = teamName.decode()
-            if teamName in teamList.teamList:
-                self.team = teamList.teamList[teamName]
+            if teamName in CTX.teams.teamList:
+                self.team = CTX.teams.teamList[teamName]
                 self.team.sendAllNotifications(self)
             else:
                 self.write_message("Error: team %s doesn't exist!!"%(teamName))
@@ -73,8 +75,8 @@ class TeamRequestHandler(tornado.web.RequestHandler):
             return
         teamName = teamName.decode()
         print("Team: %s"%(teamName))
-        if teamName in teamList.teamList:
-            self.team = teamList.teamList[teamName]
+        if teamName in CTX.teams.teamList:
+            self.team = CTX.teams.teamList[teamName]
         else:
             self.redirect("login")
             return
@@ -103,7 +105,7 @@ class AdminPage(AdminRequestHandler):
 
 class ScorePage(tornado.web.RequestHandler):
     def get(self):
-        self.render("www\\score.html", teamScoreList=teamList.getScoreList(), teamScoreHistory=teamList.getScoreHistory(), startTime=startTime)
+        self.render("www\\score.html", teamScoreList=CTX.teams.getScoreList(), teamScoreHistory=CTX.team.getScoreHistory(), startTime=startTime)
 
 class Login(tornado.web.RequestHandler):
     def get(self):
@@ -113,7 +115,7 @@ class Login(tornado.web.RequestHandler):
 
     def getTeamQuickLogin(self):
         retHTML = ""
-        for team in teamList.teamList:
+        for team in CTX.teams.teamList:
             retHTML += "<input name='QuickLogin' type='Submit' value='%s' /><br />"%(team)
         return retHTML
 
@@ -122,7 +124,7 @@ class Login(tornado.web.RequestHandler):
         try:
             if (self.get_argument("QuickLogin", None)):
                 teamName = self.get_argument("QuickLogin")
-                if teamName in teamList.teamList:
+                if teamName in CTX.teams.teamList:
                     self.set_secure_cookie("team", teamName)
                     self.redirect("\\teampage")
                     return
@@ -136,7 +138,7 @@ class Login(tornado.web.RequestHandler):
                 return
             elif (self.get_argument("login", None)):
                 teamName = self.get_argument("teamName")
-                if teamName in teamList.teamList:
+                if teamName in CTX.teams.teamList:
                     self.set_secure_cookie("team", teamName)
                     self.redirect("\\teampage")
                     return
@@ -167,9 +169,14 @@ def initilise():
     parser.add_argument("--port", "-p", type=int, default=9092, help="Port to listen on, default: 9092")
     args = parser.parse_args()
 
-    messageHandler.setMessageFile(args.messageFile)
+    commandRegistrar.setMessageFile(args.messageFile)
     if args.reloadMessages:
-        messageHandler.importMessages(args.reloadMessages)
+        import scheduler
+        with scheduler.PuzzleScheduler.reloading():
+            huntSpecific.initialise(reloading=True)
+            messageHandler.importMessages(args.reloadMessages)
+    else:
+        huntSpecific.initialise(reloading=False)
 
     settings = {
         "debug": True,

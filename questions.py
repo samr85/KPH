@@ -26,16 +26,12 @@ class Question:
     def toJson(self):
         return json.dumps(self.__dict__, indent=4)
 
-    def displayQuestionToTeam(self):
-        retStr = ""
-        retStr += "Question: %s <br />"%(self.name)
-        retStr += self.question + "<br />"
-        return retStr
-
 class QuestionList:
-    def __init__(self, jsonFile):
+    def __init__(self):
         self.questionList = collections.OrderedDict()
         self.lock = Lock()
+
+    def importQuestions(self, jsonFile):
         with self.lock:
             with open(jsonFile, "r") as f:
                 questionContent = json.load(f)
@@ -43,5 +39,3 @@ class QuestionList:
                 print(question)
                 q = Question(question)
                 self.questionList[q.name] = q
-
-questionList = QuestionList("questionList.txt")
