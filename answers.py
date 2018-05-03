@@ -29,6 +29,7 @@ class Answer:
         self.answeredTime = datetime.datetime.now()
         self.version = 1
         self.score = 0
+        self.enabled = False
 
     def correct(self):
         return self.status == CORRECT
@@ -146,7 +147,7 @@ class AnswerSubmissionQueue:
             for answer in self.answerList:
                 if answer.id == answerId:
                     return answer.renderAnswerQueue()
-        print("ERROR: answer requested for rendering %d not found", answerId)
+        # Question no longer in the answer queue, so remove from the page
         return (0, None)
 
     def getEntries(self):

@@ -23,8 +23,8 @@ class SectionType {
     constructor(name, updateFunction) {
         this.name = name;
         this.update = updateFunction;
-        this.idList = [];    //List of id->version
-        this.oldIdList = []; //A list to be used while updating to ensure that old entries that shouldn't exist any more are removed
+        this.idList = {};    //List of id->version
+        this.oldIdList = {}; //A list to be used while updating to ensure that old entries that shouldn't exist any more are removed
     }
 }
 
@@ -78,20 +78,16 @@ function updateSectionListHandler(msg)
     var msgList = msg.split(" ");
     if (msgList.length === 1) {
         // an empty string still comes out with an array of 1 entry...
+        // An empty list is unusal, but needs to clear all sections
         msgList.shift();
     }
     if (msgList.length % 3)
     {
-        if (msgList.length == 1)
-        {
-            console.log("no sections to update");
-            return;
-        }
         throw "invalid seciton list - not multiple of 3 entries!" + msg;
     }
 
     sectionTypes.forEach(function (st) {
-        st.oldIdList = st.idList.slice()
+        st.oldIdList = $.extend({}, st.idList);
         console.log("Created oldIdList for:")
         console.log(st)
     });
@@ -103,7 +99,7 @@ function updateSectionListHandler(msg)
     /*Remove no longer existing sections*/
     sectionTypes.forEach(function (st) {
         Object.keys(st.oldIdList).forEach(function (badId) {
-            console.log("Removing old section: " + st.name + " " + badId)
+            console.log("Removing old section: " + st.name + " " + badId);
             st.update(badId, "");
         });
     });

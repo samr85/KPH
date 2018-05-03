@@ -1,6 +1,6 @@
 import base64
 import abc
-from messageHandler import handleCommand
+from commandRegistrar import handleCommand
 
 class SectionHandler(abc.ABC):
     def __init__(self):
