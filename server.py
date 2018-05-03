@@ -105,7 +105,7 @@ class AdminPage(AdminRequestHandler):
 
 class ScorePage(tornado.web.RequestHandler):
     def get(self):
-        self.render("www\\score.html", teamScoreList=CTX.teams.getScoreList(), teamScoreHistory=CTX.team.getScoreHistory(), startTime=startTime)
+        self.render("www\\score.html", teamScoreList=CTX.teams.getScoreList(), teamScoreHistory=CTX.teams.getScoreHistory(), startTime=startTime)
 
 class Login(tornado.web.RequestHandler):
     def get(self):

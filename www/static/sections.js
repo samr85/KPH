@@ -12,7 +12,7 @@ update section list - sends through new section list
 update section list request - requests above.  Sent after messaging initial connect and reconnect
 [[type]]
 update seciton - updates a specific section
-[type, id, version, content]. Content of "" means delete the section
+[type, id, version, sortId, content]. Content of "" means delete the section
 update section request - requests the above, sent for each section with the wrong version after an update section list is sent
 [type, id]
 */
@@ -56,8 +56,8 @@ class SectionHolder {
         }
     }
 
-    update(contents) {
-        this.thisType.update(this.id, contents);
+    update(sortValue, contents) {
+        this.thisType.update(this.id, sortValue, contents);
         this.idList[this.id] = this.version;
     }
 }
@@ -101,7 +101,7 @@ function updateSectionListHandler(msg)
     sectionTypes.forEach(function (st) {
         Object.keys(st.oldIdList).forEach(function (badId) {
             console.log("Removing old section: " + st.name + " " + badId);
-            st.update(badId, "");
+            st.update(badId, 0, "");
         });
     });
 }
@@ -116,14 +116,17 @@ function updateSectionHandler(msg)
     //[type, id, version, content]. Content of "" means delete the section
     var msgList = msg.split(" ");
     var section = new SectionHolder(msgList);
+    var sortValue = msgList.shift();
     var contentsBase64 = msgList.shift();
     var contents = window.atob(contentsBase64);
-    section.update(contents);
+    section.update(sortValue, contents);
 }
+
+function sortCallback(a, b) { return $(a).data('sort') > $(b).data('sort'); }
 
 function standardSection(holderName) {
     sectionName = holderName + "Section"
-    function updateStandardSection(id, data) {
+    function updateStandardSection(id, sortValue, data) {
         console.log("Calling update for section: " + holderName + " for id: " + id);
         oldSection = $("#" + sectionName + id)
         if (data.length === 0) {
@@ -141,14 +144,16 @@ function standardSection(holderName) {
                 {
                     throw "holder " + holderName + " does not exist!";
                 }
-                holder.append(section)
+                holder.append(section);
             }
             else {
-                section = oldSection[0]
+                section = oldSection[0];
             }
             section.innerHTML = data;
+            $(section).data('sort', sortValue);
         }
         // SORT
+        $('.' + sectionName).sort(sortCallback).appendTo('#' + holderName);
     }
     return updateStandardSection;
 }

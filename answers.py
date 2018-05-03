@@ -83,15 +83,15 @@ class Answer:
     def renderQuestion(self):
         version = self.version
         html = SECTION_LOADER.load("question.html").generate(answer=self)
-        return (version, html)
+        return (version, self.question.id, html)
 
     def renderAnswerQueue(self):
         if self.awaitingAnswer():
             version = self.version
             html = SECTION_LOADER.load("answerQueue.html").generate(answer=self)
-            return (version, html)
+            return (version, self.answeredTime.isoformat(), html)
         print("ERROR: requesting admin answer for one that isn't awaiting an answer")
-        return (self.version, None)
+        return (self.version, 0, None)
 
     def requestHint(self):
         if self.hintCount < len(self.question.hints):
@@ -146,13 +146,13 @@ class AnswerSubmissionQueue:
             answerId = int(answerId)
         except ValueError:
             print("Error: invalid answerid: %s", answerId)
-            return (0, None)
+            return (0, 0, None)
         with self.lock:
             for answer in self.answerList:
                 if answer.id == answerId:
                     return answer.renderAnswerQueue()
         # Question no longer in the answer queue, so remove from the page
-        return (0, None)
+        return (0, 0, None)
 
     def getEntries(self):
         entriesList = []

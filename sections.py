@@ -14,7 +14,7 @@ class SectionHandler(abc.ABC):
 
     @abc.abstractmethod
     def requestSection(self, server, sectionId):
-        #return (version, content)
+        #return (version, sortValue, content)
         return None
 
 sectionHandlers = {}
@@ -42,11 +42,11 @@ def pushSection(servers, section, sectionId):
     if not servers:
         return
     sectionReqHandler = getSectionHandler(section, servers[0])
-    (version, html) = sectionReqHandler.requestSection(servers[0], str(sectionId))
+    (version, sortValue, html) = sectionReqHandler.requestSection(servers[0], str(sectionId))
     if not html:
         html = b''
     for server in servers:
-        server.write_message("updateSection %s %s %s %s"%(section, str(sectionId), version,
+        server.write_message("updateSection %s %s %s %s %s"%(section, str(sectionId), version, sortValue,
                                                           base64.b64encode(html).decode()))
 
 
@@ -73,10 +73,10 @@ def updateSectionRequest(server, messageList, _unusedTime):
         sectionReq = messageList[0]
         sectionId = messageList[1]
         sectionReqHandler = getSectionHandler(sectionReq, server)
-        (version, html) = sectionReqHandler.requestSection(server, sectionId)
+        (version, sortValue, html) = sectionReqHandler.requestSection(server, sectionId)
         if not html:
             html = b''
-        server.write_message("updateSection %s %s %s %s"%(sectionReq, sectionId, version,
+        server.write_message("updateSection %s %s %s %s %s"%(sectionReq, sectionId, version, sortValue, 
                                                           base64.b64encode(html).decode()))
     except InvalidRequest as ex:
         server.write_message("error " + str(ex))
@@ -88,10 +88,10 @@ class QuestionSectionHandler(SectionHandler):
         self.requireTeam = True
 
     def requestSection(self, server, sectionId):
-        (version, html) = server.team.renderQuestion(sectionId)
+        (version, sortValue, html) = server.team.renderQuestion(sectionId)
         if version == 0:
             raise InvalidRequest("Question name %s not available to team"%(sectionId))
-        return (version, html)
+        return (version, sortValue, html)
 
     def requestUpdateList(self, server):
         versionList = []

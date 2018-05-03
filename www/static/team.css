@@ -4,6 +4,9 @@
 .questionName {
     font-weight: bold;
 }
+.questionListSection {
+    margin-top: 25px;
+}
 
 .questionDisabled {
     color: grey;

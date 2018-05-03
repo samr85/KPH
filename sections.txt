@@ -6,6 +6,6 @@ messages:
 update section list - sends through new section list
 update section list request - requests above.  Sent after page load
 update seciton - updates a specific section
-[type, id, version, content].  Content of "" means delete the section
+[type, id, version, sortValue, content].  Content of "" means delete the section
 update section request - requests the above
 [type, id]
