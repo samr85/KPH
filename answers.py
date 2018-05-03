@@ -35,10 +35,10 @@ class Answer:
         return self.status == CORRECT
 
     def canSubmitAnswer(self):
-        return self.status == INCORRECT
+        return self.status == INCORRECT and self.enabled
 
     def canRequestHint(self):
-        return self.canSubmitAnswer() and len(self.question.hints) > self.hintCount
+        return self.canSubmitAnswer() and len(self.question.hints) > self.hintCount and self.enabled
 
     def awaitingAnswer(self):
         return self.status == SUBMITTED
@@ -46,10 +46,12 @@ class Answer:
     def update(self):
         # Team structure holding this should already be locked
         self.version += 1
-        sections.pushSection(self.team.messagingClients, "question", self.question.name)
+        sections.pushSection(self.team.messagingClients, "question", self.question.id)
         sections.pushSection(admin.adminList.messagingClients, "answerQueue", self.id)
 
     def submitAnswer(self, answer, time):
+        if not self.enabled:
+            raise ErrorMessage("Cannot submit answer to disabled question")
         if self.status == INCORRECT:
             self.answer = answer
             answerQueue.queueAnswer(self)
@@ -63,6 +65,7 @@ class Answer:
             raise ErrorMessage("Can't submit an answer to an already answered question!")
 
     def mark(self, mark, score):
+        # Admins should still be able to mark questions once they've been disabled if the user submitted an answer before the question was disabled
         if mark:
             self.status = CORRECT
             self.team.notifyTeam("%s answer: CORRECT!"%(self.question.name))

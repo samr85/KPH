@@ -4,38 +4,35 @@ import collections
 
 class Question:
     nextId = 0
-    def __init__(self, dictionary):
-        self.name = ""
+    def __init__(self):
+        self.name = self.__class__.__name__.replace("_", " ")
         self.question = ""
+        self.score = 10
         self.answers = []
         self.hints = []
-        self.hintCost = 0
-        self.__dict__ = dictionary
-        if not (hasattr(self, "name") and
-                hasattr(self, "question") and
-                hasattr(self, "answers") and
-                hasattr(self, "hints")):
-            raise ValueError("Invalid question dictionary: %s"%(dictionary))
         for hint in self.hints:
             if "cost" not in hint:
                 hint["cost"] = self.hintCost
-        self.id = Question.nextId
+        self.id = str(Question.nextId)
         Question.nextId += 1
         # TODO: Check dictionary loaded right!
+
+    def addHint(self, hintHTML, cost = 2):
+        """ Adds a hint to the question"""
+        self.hints.append({"hint": hintHTML, "cost": cost})
 
     def toJson(self):
         return json.dumps(self.__dict__, indent=4)
 
 class QuestionList:
-    def __init__(self):
-        self.questionList = collections.OrderedDict()
-        self.lock = Lock()
+    questionList = collections.OrderedDict()
+    lock = Lock()
 
-    def importQuestions(self, jsonFile):
-        with self.lock:
-            with open(jsonFile, "r") as f:
-                questionContent = json.load(f)
-            for question in questionContent:
-                print(question)
-                q = Question(question)
-                self.questionList[q.name] = q
+    @staticmethod
+    def registerQuestion(question):
+        q = question()
+        with QuestionList.lock:
+            QuestionList.questionList[q.name] = q
+        return question
+
+registerQuestion = QuestionList.registerQuestion

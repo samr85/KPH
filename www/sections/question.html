@@ -1,9 +1,11 @@
 {%autoescape None%}
 {%set question = answer.question%}
 
-<div class="question">
+<div class="question{%if not answer.enabled%} questionDisabled{%end%}">
     <div class="questionName">Question: {{question.name}}</div>
+    {%if question.question%}
     <div class="questionDescription">{{question.question}}</div>
+    {%end%}
 </div>
 <div class="answer">
     {%if answer.correct()%}
@@ -16,7 +18,7 @@
         {%if answer.canRequestHint()%}
         <div class="hintRequest">
             Score reduction for solving this question if you request another hint: {{question.hints[answer.hintCount]["cost"]}} 
-            <button onclick="requestHint('{{question.name}}');">Request Hint</button>
+            <button onclick="requestHint('{{question.id}}');">Request Hint</button>
         </div>
         {%end%}
     </div>
@@ -32,9 +34,9 @@
     </div>
     {%elif answer.canSubmitAnswer()%}
     <div class="answerRequest">
-        <div id="{{question.name}}Err"></div>
-        <input id="{{question.name}}Answer" type="text" name="" />
-        <button onclick="submitAnswer('{{question.name}}')">Submit answer</button>
+        <div id="{{question.id}}Err"></div>
+        <input id="{{question.id}}Answer" type="text" name="" />
+        <button onclick="submitAnswer('{{question.id}}')">Submit answer</button>
     </div>
     {%end%}
 </div>

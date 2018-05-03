@@ -42,11 +42,11 @@ def pushSection(servers, section, sectionId):
     if not servers:
         return
     sectionReqHandler = getSectionHandler(section, servers[0])
-    (version, html) = sectionReqHandler.requestSection(servers[0], sectionId)
+    (version, html) = sectionReqHandler.requestSection(servers[0], str(sectionId))
     if not html:
         html = b''
     for server in servers:
-        server.write_message("updateSection %s %s %s %s"%(section, sectionId, version,
+        server.write_message("updateSection %s %s %s %s"%(section, str(sectionId), version,
                                                           base64.b64encode(html).decode()))
 
 
@@ -96,7 +96,7 @@ class QuestionSectionHandler(SectionHandler):
     def requestUpdateList(self, server):
         versionList = []
         for answer in server.team.questionAnswers.values():
-            versionList.append((answer.question.name, answer.version))
+            versionList.append((answer.question.id, answer.version))
         return versionList
 
 @registerSectionHandler("answerQueue")

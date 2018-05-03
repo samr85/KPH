@@ -11,8 +11,6 @@ class Team:
         self.questionAnswers = {}
         self.messages = []
         self.lock = RLock()
-        #for qName, question in questionList.questionList.items():
-        #    self.questionAnswers[qName] = Answer(question, self)
         self.messagingClients = []
 
     def notifyTeam(self, message):
@@ -25,17 +23,17 @@ class Team:
         for message in self.messages:
             client.write_message(message)
 
-    def submitAnswer(self, question, answer, time):
-        if question not in self.questionAnswers:
-            raise ErrorMessage("Team does not have access to question: %s"%(question))
-        answerItem = self.questionAnswers[question]
-        answerItem.submitAnswer(answer, time)
-        self.notifyTeam("Answer %s submitted for question %s"%(answer, question))
+    def submitAnswer(self, questionId, answerString, time):
+        if questionId not in self.questionAnswers:
+            raise ErrorMessage("Team does not have access to question: %s"%(questionId))
+        answerItem = self.questionAnswers[questionId]
+        answerItem.submitAnswer(answerString, time)
+        self.notifyTeam("Answer %s submitted for question %s"%(answerString, questionId))
 
-    def requestHint(self, question):
-        if question not in self.questionAnswers:
-            raise ErrorMessage("Team does not have access to question: %s"%(question))
-        self.questionAnswers[question].requestHint()
+    def requestHint(self, questionId):
+        if questionId not in self.questionAnswers:
+            raise ErrorMessage("Team does not have access to question: %s"%(questionId))
+        self.questionAnswers[questionId].requestHint()
 
     def getScore(self):
         score = 0
@@ -61,10 +59,10 @@ class Team:
         answerHistory.append((datetime.datetime.now(), curScore, datetimeToJsString(datetime.datetime.now())))
         return answerHistory
 
-    def renderQuestion(self, questionName):
-        if questionName in self.questionAnswers:
-            return self.questionAnswers[questionName].renderQuestion()
-        raise ErrorMessage("Invalid question: %s"%(questionName))
+    def renderQuestion(self, questionId):
+        if questionId in self.questionAnswers:
+            return self.questionAnswers[questionId].renderQuestion()
+        raise ErrorMessage("Invalid question: %s"%(questionId))
 
 def datetimeToJsString(dt):
     return  str(tuple([i for i in dt.timetuple()][:6]))

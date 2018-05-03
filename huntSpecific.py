@@ -8,10 +8,10 @@ def initialise(reloading=False):
     loadTeamList()
 
     if not reloading:
-        scheduler.runIn(10, startHunt)
+        scheduler.runIn(2, startHunt)
 
 def loadQuestionList():
-    CTX.questions.importQuestions("questionList.txt")
+    import dummyQuestionList
 
 def loadTeamList():
     CTX.teams.createTeam("aa")
@@ -21,3 +21,10 @@ def startHunt():
     print("Hunt is starting!!!")
     for question in CTX.questions.questionList.values():
         CTX.enableQuestion(question)
+    CTX.disableQuestion(question, CTX.teams.getTeam("bb"))
+
+
+def huntEnd():
+    print("Hunt has finished!")
+    for question in CTX.questions.questionList.values():
+        CTX.disableQuestion(question)

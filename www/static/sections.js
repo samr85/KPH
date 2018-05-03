@@ -78,7 +78,7 @@ function updateSectionListHandler(msg)
     var msgList = msg.split(" ");
     if (msgList.length === 1) {
         // an empty string still comes out with an array of 1 entry...
-        // An empty list is unusal, but needs to clear all sections
+        // An empty list means to clear all sections
         msgList.shift();
     }
     if (msgList.length % 3)
@@ -87,7 +87,8 @@ function updateSectionListHandler(msg)
     }
 
     sectionTypes.forEach(function (st) {
-        st.oldIdList = $.extend({}, st.idList);
+        st.oldIdList = st.idList
+        st.idList = {}
         console.log("Created oldIdList for:")
         console.log(st)
     });

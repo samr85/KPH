@@ -4,3 +4,7 @@
 .questionName {
     font-weight: bold;
 }
+
+.questionDisabled {
+    color: grey;
+}
