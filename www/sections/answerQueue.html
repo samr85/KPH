@@ -15,7 +15,7 @@
     {%end%}
     <form id="F{{answer.id}}">
         <input type="hidden" id="teamName{{answer.id}}" value="{{answer.team.name}}" />
-        <input type="hidden" id="questionName{{answer.id}}" value="{{answer.question.name}}" />
+        <input type="hidden" id="questionName{{answer.id}}" value="{{answer.question.id}}" />
         <input type="hidden" id="correct{{answer.id}}" value="{{correct}}" />
         <input type="checkbox" id="override{{answer.id}}" />Override expected answer<br />
         <button onclick="mark('{{answer.id}}', 'Correct'); return false;" class="mark{{correct}}">Correct</button><br />

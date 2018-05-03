@@ -15,6 +15,14 @@ class name_of_question(Question):
         # leaving score at the default of 10
 
 @registerQuestion
+class dependentOn1(Question):
+    def __init__(self):
+        super().__init__()
+        self.question = "what is 2+2"
+        self.answers.append("4")
+        self.unlockOn = name_of_question
+
+@registerQuestion
 class Q2(Question):
     def __init__(self):
         super().__init__()

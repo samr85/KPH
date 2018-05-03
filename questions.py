@@ -10,12 +10,9 @@ class Question:
         self.score = 10
         self.answers = []
         self.hints = []
-        for hint in self.hints:
-            if "cost" not in hint:
-                hint["cost"] = self.hintCost
+        self.unlockOn = "initial"
         self.id = str(Question.nextId)
         Question.nextId += 1
-        # TODO: Check dictionary loaded right!
 
     def addHint(self, hintHTML, cost = 2):
         """ Adds a hint to the question"""
@@ -23,6 +20,13 @@ class Question:
 
     def toJson(self):
         return json.dumps(self.__dict__, indent=4)
+
+    def unlockDependents(self, team):
+        from controller import CTX
+        for question in QuestionList.questionList.values():
+            if question.unlockOn == self.__class__:
+                print("unlocking " + question.name)
+                CTX.enableQuestion(question, team)
 
 class QuestionList:
     questionList = collections.OrderedDict()

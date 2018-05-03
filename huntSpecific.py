@@ -20,7 +20,8 @@ def loadTeamList():
 def startHunt():
     print("Hunt is starting!!!")
     for question in CTX.questions.questionList.values():
-        CTX.enableQuestion(question)
+        if question.unlockOn == "initial":
+            CTX.enableQuestion(question)
     CTX.disableQuestion(question, CTX.teams.getTeam("bb"))
 
 

@@ -73,6 +73,7 @@ class Answer:
                 self.score = self.question.score
             else:
                 self.score = score
+            self.question.unlockDependents(self.team)
         else:
             self.status = INCORRECT
             self.team.notifyTeam("%s answer: INCORRECT :("%(self.question.name))
@@ -125,11 +126,11 @@ class AnswerSubmissionQueue:
                     raise ErrorMessage("Cannot submit another answer until your previous one has been marked (answer: %s pending for question: %s)" % (answer.answer, answer.question.name))
             self.answerList.append(newAnswer)
 
-    def markAnswer(self, teamName, questionName, mark, value=0):
+    def markAnswer(self, teamName, questionId, mark, value=0):
         found = False
         with self.lock:
             for answer in self.answerList:
-                if answer.team.name == teamName and answer.question.name == questionName:
+                if answer.team.name == teamName and answer.question.id == questionId:
                     found = answer
                     self.answerList.remove(answer)
                     break
