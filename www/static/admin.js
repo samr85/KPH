@@ -27,4 +27,18 @@ function mark(id, mark) {
     }
 }
 
+function messageTeam() {
+    var message = $("#teamMessage")[0].value;
+    var teamName = $("#teamMessageName")[0].value;
+    if (!teamName) {
+        logError("Please enter a team to message");
+        return;
+    }
+    if (!message) {
+        logError("Please enter a message to send to the team")
+        return;
+    }
+    sendMessage("messageTeam " + teamName + " " + message);
+}
+
 initialiseSection("answerQueue", standardSection("answerQueue"), [])

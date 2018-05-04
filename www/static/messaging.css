@@ -10,6 +10,16 @@
     font-weight: bold;
 }
 
-#messageList .adminMessage {
-    color: aqua;
+#messageList .messageSent {
+    color: blue;
+}
+
+#messageList .messageReceived {
+    color: brown;
+    font-weight: bold;
+}
+
+#messageList .announcement {
+    color: darkred;
+    font-weight: bold;
 }

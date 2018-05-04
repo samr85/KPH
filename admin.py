@@ -35,3 +35,23 @@ def markAnswer(_server, messageList, _time):
         answers.answerQueue.markAnswer(messageList[0], messageList[1], messageList[2].lower() == "correct", score)
     else:
         raise ErrorMessage("Incorrect number of parameters to markAnswer (got %d)!"%(len(messageList)))
+
+@handleCommand("messageAdmin", teamRequired=True)
+def teamMessageAdmin(server, messageList, _time):
+    adminList.messageAdmin("Team Message: %s: %s"%(server.team.name, " ".join(messageList)))
+    server.team.notifyTeam("Message Sent: %s"%(" ".join(messageList)))
+
+@handleCommand("messageTeam", adminRequired=True)
+def adminMessageTeam(server, messageList, _time):
+    teamName = messageList[0]
+    message = " ".join(messageList[1:])
+    from controller import CTX
+    if teamName == "all":
+        adminList.messageAdmin("Announcement: %s"%(message))
+        for team in CTX.teams.teamList.values():
+            team.notifyTeam("Announcement: %s"%(message))
+    else:
+        # raises exception on error
+        team = CTX.teams.getTeam(teamName)
+        team.notifyTeam("Admin Message: %s"%(message))
+        adminList.messageAdmin("Message Sent: %s: %s"%(teamName, message))

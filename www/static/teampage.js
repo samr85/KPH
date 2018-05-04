@@ -16,4 +16,13 @@ function requestHint(question)
     sendMessage("reqHint " + question);
 }
 
+function messageAdmin() {
+    var message = $("#adminMessage")[0].value;
+    if (!message) {
+        logError("Please enter a message to send to the admins")
+        return
+    }
+    sendMessage("messageAdmin " + message);
+}
+
 initialiseSection("question", standardSection("questionList"), []);

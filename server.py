@@ -96,7 +96,7 @@ class TeamRequestHandler(tornado.web.RequestHandler):
 
 class TeamPage(TeamRequestHandler):
     def getTeam(self):
-        self.render("www\\sections.html", answers=self.team.questionAnswers.values(), pageTitle="Team %s"%(self.team.name))
+        self.render("www\\teampage.html", answers=self.team.questionAnswers.values(), pageTitle="Team %s"%(self.team.name))
 
 class AdminRequestHandler(tornado.web.RequestHandler):
     def get(self, *args, **kwargs):

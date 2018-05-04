@@ -94,8 +94,26 @@ $(function createWebSocket() {
 });
 
 function categoriseMessages(section) {
-    if (section.innerHTML.startsWith("Error:")) {
-        section.className += " errorMessage"
+    var message = section.innerHTML
+    var colonPos = message.indexOf(":")
+    if (colonPos) {
+        switch (message.substr(0, colonPos).toLowerCase()) {
+            case "error":
+                section.className += " errorMessage";
+                break;
+            case "message sent":
+                section.className += " messageSent";
+                break;
+
+            case "team message":
+            case "admin message":
+                section.className += " messageReceived";
+                break;
+
+            case "announcement":
+                section.className += " announcement";
+                break;
+        }
     }
     var cont = $("#messageList")[0]
     cont.scrollTop = cont.scrollHeight;
