@@ -14,7 +14,7 @@ class Question:
         self.id = str(Question.nextId)
         Question.nextId += 1
 
-    def addHint(self, hintHTML, cost = 2):
+    def addHint(self, hintHTML, cost=2):
         """ Adds a hint to the question"""
         self.hints.append({"hint": hintHTML, "cost": cost})
 

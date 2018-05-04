@@ -172,7 +172,7 @@ def initilise():
     commandRegistrar.setMessageFile(args.messageFile)
     if args.reloadMessages:
         import scheduler
-        with scheduler.PuzzleScheduler.reloading():
+        with scheduler.PUZZLE_SCHEDULER.reloading():
             huntSpecific.initialise(reloading=True)
             messageHandler.importMessages(args.reloadMessages)
     else:

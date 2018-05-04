@@ -107,4 +107,5 @@ class TeamList:
 
 @handleCommand("createTeam", 1)
 def createTeam(server, messageList, _time):
+    from controller import CTX
     server.team = CTX.teams.createTeam(messageList[0])

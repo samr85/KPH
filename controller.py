@@ -40,7 +40,7 @@ class HuntContext:
         if question.id not in team.questionAnswers:
             team.questionAnswers[question.id] = answers.Answer(question, team)
         team.questionAnswers[question.id].enabled = True
-        sections.pushSection(team.messagingClients, "question", question.id)
+        sections.pushSection("question", question.id, team)
 
     def disableQuestion(self, question, team=None):
         if not team:
@@ -50,7 +50,7 @@ class HuntContext:
         if question.id not in team.questionAnswers:
             return
         team.questionAnswers[question.id].enabled = False
-        sections.pushSection(team.messagingClients, "question", question.id)
+        sections.pushSection("question", question.id, team)
 
 
 CTX = HuntContext()

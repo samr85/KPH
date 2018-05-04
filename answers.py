@@ -5,7 +5,6 @@ import tornado
 
 from globalItems import ErrorMessage
 import sections
-import admin
 
 SECTION_LOADER = tornado.template.Loader("www/sections")
 INCORRECT = 0
@@ -46,8 +45,8 @@ class Answer:
     def update(self):
         # Team structure holding this should already be locked
         self.version += 1
-        sections.pushSection(self.team.messagingClients, "question", self.question.id)
-        sections.pushSection(admin.adminList.messagingClients, "answerQueue", self.id)
+        sections.pushSection("question", self.question.id, self.team)
+        sections.pushSection("answerQueue", self.id)
 
     def submitAnswer(self, answer, time):
         if not self.enabled:

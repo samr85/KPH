@@ -3,6 +3,7 @@ import collections
 import datetime
 import time
 import contextlib
+import traceback
 
 class PuzzleScheduler:
     TriggerEvent = collections.namedtuple("TriggerEvent", ["callTime", "callback", "args", "kwargs"])
@@ -22,6 +23,7 @@ class PuzzleScheduler:
                     runNow.callback(*runNow.args, **runNow.kwargs)
                 except Exception as e:
                     print("Exception in timer callback: " + str(e))
+                    traceback.print_exc()
                 runNow = None
 
             self._waitsModified.clear()
