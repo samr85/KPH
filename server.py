@@ -57,7 +57,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         print('connection closed.')
 
     def write_message(self, message, binary=False):
-        print("MSG Tx: " + message)
+        print("MSG Tx: " + (message[:75] + "...") if len(message) > 78 else message)
         return super().write_message(message, binary)
 
     def sendRefresh(self):

@@ -68,8 +68,11 @@ def pushSection(sectionName, sectionId, requestorSubset=None):
     if not html:
         html = b''
     for requestor in requestors:
-        requestor.write_message("updateSection %s %s %s %s %s"%(sectionName, str(sectionId), version, sortValue,
-                                                                base64.b64encode(html).decode()))
+        try:
+            requestor.write_message("updateSection %s %s %s %s %s"%(sectionName, str(sectionId), version, sortValue,
+                                                                    base64.b64encode(html).decode()))
+        except tornado.websocket.WebSocketClosedError:
+            print("Cannot send push for %s, socket closed"%(sectionName))
 
 @handleCommand("UpdateSectionListRequest", logMessage=False)
 def updateSectionListRequest(requestor, messageList, _time):

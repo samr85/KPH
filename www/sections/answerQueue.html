@@ -4,7 +4,13 @@
     Question: {{answer.question.name}}<br />
     Submitted answer: {{answer.answer}}<br />
     {%set answers = answer.question.answers %}
-    Correct answers: {{", ".join(answers)}}
+    Correct answers: {{", ".join(answers)}}<br />
+    Previously submitted answers: {{", ".join(answer.previousAnswers)}} <br />
+    Hints requested: {{"%d/%d"%(answer.hintCount, answer.question.hints.__len__())}}, costing: {{answer.getCurrentHintCost()}}points<br />
+    {%if answer.question.score!=0%}
+    Points for question: {{answer.question.score}}<br />
+    {%end%}
+
     {# Do we expect the answer to be correct?#}
     {%if answer.answer.lower() in answers%}
       {%set correct = "Correct"%}
@@ -13,11 +19,16 @@
       {%set correct = "Incorrect"%}
       {%set incorrect = "Correct"%}
     {%end%}
+    
     <form id="F{{answer.id}}">
         <input type="hidden" id="teamName{{answer.id}}" value="{{answer.team.name}}" />
         <input type="hidden" id="questionName{{answer.id}}" value="{{answer.question.id}}" />
         <input type="hidden" id="correct{{answer.id}}" value="{{correct}}" />
         <input type="checkbox" id="override{{answer.id}}" />Override expected answer<br />
+        {%if answer.question.score==0%}
+        <input type="number" id="score{{answer.id}}" />Score for question<br />
+        Note: {{answer.getCurrentHintCost()}} points will be taken off this score for hints<br />
+        {%end%}
         <button onclick="mark('{{answer.id}}', 'Correct'); return false;" class="mark{{correct}}">Correct</button><br />
         <button onclick="mark('{{answer.id}}', 'Incorrect'); return false;" class="mark{{incorrect}}">Incorrect</button><br />
     </form>

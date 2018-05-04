@@ -100,14 +100,15 @@ class Answer:
         else:
             raise ErrorMessage("All hints already requested")
 
+    def getCurrentHintCost(self):
+        hintCost = 0
+        for hintNo in range(self.hintCount):
+            hintCost += self.question.hints[hintNo]["cost"]
+        return hintCost
+
     def getScore(self):
         if self.status == CORRECT:
-            hintCost = 0
-            for hintNo in range(self.hintCount):
-                if "cost" in self.question.hints[hintNo]:
-                    hintCost += self.question.hints[hintNo]["cost"]
-                else:
-                    hintCost += self.question.hintCosts
+            hintCost = self.getCurrentHintCost()
             if self.score > hintCost:
                 return self.score - hintCost
         return 0

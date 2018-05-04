@@ -1,4 +1,5 @@
 import datetime
+import base64
 
 from globalItems import ErrorMessage
 from commandRegistrar import commands, handleCommand
@@ -55,7 +56,8 @@ def ping(server, _messageList, _time):
 
 @handleCommand("subAnswer", 2, teamRequired=True)
 def submitAnswer(server, messageList, time):
-    server.team.submitAnswer(messageList[0], messageList[1], time)
+    answer = base64.b64decode(messageList[1]).decode()
+    server.team.submitAnswer(messageList[0], answer, time)
 
 @handleCommand("reqHint", 1, teamRequired=True)
 def reqHint(server, messageList, _time):

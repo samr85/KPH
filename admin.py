@@ -26,6 +26,10 @@ def markAnswer(_server, messageList, _time):
     if len(messageList) == 3:
         answers.answerQueue.markAnswer(messageList[0], messageList[1], messageList[2].lower() == "correct", 0)
     elif len(messageList) == 4:
-        answers.answerQueue.markAnswer(messageList[0], messageList[1], messageList[2].lower() == "correct", messageList[3])
+        try:
+            score = int(messageList[3])
+        except ValueError:
+            raise ErrorMessage("Invalid number for score: %s"%(messageList[3]))
+        answers.answerQueue.markAnswer(messageList[0], messageList[1], messageList[2].lower() == "correct", score)
     else:
         raise ErrorMessage("Incorrect number of parameters to markAnswer (got %d)!"%(len(messageList)))

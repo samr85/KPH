@@ -1,18 +1,15 @@
 from questions import Question, registerQuestion
 
-#Question defaults:
-# score: 10
-# hintCost: 2
-
 @registerQuestion
 class name_of_question(Question):
     def __init__(self):
         super().__init__()
         self.question = "what is 1+1?"
+        self.answers = ["2", "a window"]
+        self.score = 10
+        self.defaultHintCost = 2
         self.addHint("Use a calculator")
         self.addHint("1 less than 3", 5)
-        self.answers = ["2", "a window"]
-        # leaving score at the default of 10
 
 @registerQuestion
 class dependentOn1(Question):
@@ -21,6 +18,7 @@ class dependentOn1(Question):
         self.question = "what is 2+2"
         self.answers.append("4")
         self.unlockOn = name_of_question
+        self.score = 10
 
 @registerQuestion
 class Q2(Question):
