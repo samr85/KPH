@@ -7,7 +7,9 @@ def initialise(reloading=False):
     loadQuestionList()
     loadTeamList()
 
-    if not reloading:
+    if reloading:
+        startHunt()
+    else:
         scheduler.runIn(2, startHunt)
 
 def loadQuestionList():
