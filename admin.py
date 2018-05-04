@@ -1,14 +1,16 @@
 import answers
 from commandRegistrar import handleCommand
 from globalItems import ErrorMessage
+import sections
 
 class AdminList:
     def __init__(self):
         self.messagingClients = []
+        self.messages = []
 
     def messageAdmin(self, message):
-        for client in self.messagingClients:
-            client.write_message(message)
+        self.messages.append(message)
+        sections.pushSection("message", len(self.messages) - 1, "admin")
 
     @staticmethod
     def renderAnswerQueue(answerId):

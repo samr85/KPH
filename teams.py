@@ -1,6 +1,7 @@
 from threading import RLock, Lock
 import datetime
 import collections
+import sections
 
 from globalItems import ErrorMessage, startTime
 from commandRegistrar import handleCommand
@@ -15,13 +16,7 @@ class Team:
 
     def notifyTeam(self, message):
         self.messages.append(message)
-        for client in self.messagingClients:
-            client.write_message(message)
-
-    def sendAllNotifications(self, client):
-        # TODO: this looks bad
-        for message in self.messages:
-            client.write_message(message)
+        sections.pushSection("message", len(self.messages) - 1, self)
 
     def submitAnswer(self, questionId, answerString, time):
         if questionId not in self.questionAnswers:

@@ -17,8 +17,7 @@
         {%end%}
         {%if answer.canRequestHint()%}
         <div class="hintRequest">
-            Score reduction for solving this question if you request another hint: {{question.hints[answer.hintCount]["cost"]}} 
-            <button onclick="requestHint('{{question.id}}');">Request Hint</button>
+            <button onclick="requestHint('{{question.id}}');">Request Hint</button> (cost: {{question.hints[answer.hintCount]["cost"]}} points)
         </div>
         {%end%}
     </div>
@@ -34,9 +33,10 @@
     </div>
     {%elif answer.canSubmitAnswer()%}
     <div class="answerRequest">
-        <div id="{{question.id}}Err"></div>
-        <input id="{{question.id}}Answer" type="text" name="" />
-        <button onclick="submitAnswer('{{question.id}}')">Submit answer</button>
+        <form action="javascript:void(0)">
+            <input id="{{question.id}}Answer" type="text" name="" />
+            <button onclick="submitAnswer('{{question.id}}')">Submit answer</button>
+        </form>
     </div>
     {%end%}
 </div>

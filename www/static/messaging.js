@@ -1,3 +1,4 @@
+'use strict';
 var SOCKET;
 
 function sendMessage(message)
@@ -7,69 +8,39 @@ function sendMessage(message)
 }
 
 function errorHandler(message) {
-    logError("Error: " + message);
+    logError(message);
 }
 
 function jsHandler(message) {
     eval(message);
 }
 
-function sectionHandlerUNUSED(message) {
-    var msgList = message.split(" ")
-    if (msgList.length < 2) {
-        errorHandler("Invalid section message: " + message)
-        return
-    }
-    var div = $("#" + msgList[0])
-    if (div.length != 1) {
-        errorHandler("Invalid div to modify: " + msgList[0])
-        return
-    }
-    div = div[0]
-    var action = msgList[1]
-    if (action == "remove") {
-        div.parentNode.removeChild(div)
-        return
-    }
-    else if (action == "append" || action == "replace") {
-        if (msgList.length != 3) {
-            errorHandler("Invalid section message: " + message)
-            return
-        }
-        $.get(msgList[2])
-            .done(function (data) {
-                if (action == "append") {
-                    div.innerHTML += data
-                } else {
-                    div.innerHTML = data
-                }
-            })
-            .error(function () {
-                errorHandler("Error requesting div refresh for " + divName)
-            })
-    } else {
-        errorHandler("Unknown action: " + action)
-    }
-}
-
 function logError(message)
 {
+    message = "Error: " + message
     console.log(message)
-    addLogMessage(message, "errorMessage");
+    addLogMessage(message);
 }
 
-function addLogMessage(message, type = null)
+function addLogMessage(message)
 {
-    var s = document.createElement("div");
-    if (type) {
-        s.className += " " + type
+    /* Get last element currently in the log */
+    var holder = $('#messageList')[0]
+    var section = sectionTypes.get("message")
+    if (holder == undefined || section == undefined) {
+        console.log("Failed to find message holder for message:");
+        console.log(message);
+        return;
     }
-    s.innerHTML = message;
-    cont = $("#messageLog")[0];
-    cont.appendChild(s);
-    cont.scrollTop = cont.scrollHeight;
+    var sort = ""
+    var lastElement = holder.lastChild
+    if (lastElement) {
+        sort = $(lastElement).data("sort")
+    }
+    sort += "-"
+    section.update("extra" + sort, sort, message)
 }
-connectionBroken = false
+var connectionBroken = false
 
 $(function createWebSocket() {
 
@@ -121,3 +92,12 @@ $(function createWebSocket() {
     }
 
 });
+
+function categoriseMessages(section) {
+    if (section.innerHTML.startsWith("Error:")) {
+        section.className += " errorMessage"
+    }
+    var cont = $("#messageList")[0]
+    cont.scrollTop = cont.scrollHeight;
+}
+initialiseSection("message", standardSection("messageList", categoriseMessages), [])

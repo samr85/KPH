@@ -1,7 +1,7 @@
 import base64
 import abc
 from commandRegistrar import handleCommand
-from globalItems import ErrorMessage
+import tornado
 
 class SectionHandler(abc.ABC):
     def __init__(self):
@@ -10,20 +10,25 @@ class SectionHandler(abc.ABC):
         self.requestors = []
 
     def registerForUpdates(self, requestor):
+        """Request future updates for this type of message"""
         if requestor not in self.requestors:
             self.requestors.append(requestor)
 
-    def getRequestors(self, requestorTeam):
-        # Should this have other filters beyond just the team?
-        if not self.requireTeam:
+    def getRequestors(self, requestorSubset):
+        """Return the subset of requestors that matches requestorSubset.
+           Builtin implementation filters on "admin" or team class, can be
+           overwritten to do other filtering"""
+        # If a team is required, then we must know what team it is
+        # otherwise, just filter if we've been given something to filter on
+        if self.requireTeam:
+            return [x for x in self.requestors if x.team == requestorSubset]
+
+        if not requestorSubset:
             return self.requestors
-        if not requestorTeam:
-            raise ErrorMessage("getRequestors called with a required team, but no team given")
-        reqs = []
-        for req in self.requestors:
-            if req.team == requestorTeam:
-                reqs.append(req)
-        return reqs
+        if requestorSubset == "admin":
+            return [x for x in self.requestors if x.admin]
+        else:
+            return [x for x in self.requestors if x.team == requestorSubset]
 
     @abc.abstractmethod
     def requestUpdateList(self, requestor):
@@ -38,6 +43,7 @@ class SectionHandler(abc.ABC):
 sectionHandlers = {}
 
 def registerSectionHandler(sectionId):
+    """Register this class as a handler for the named section"""
     def registerSectionHandlerInt(handlerClass):
         sectionHandlers[sectionId] = handlerClass()
         return handlerClass
@@ -89,7 +95,7 @@ def updateSectionListRequest(requestor, messageList, _time):
                 sectionList.append(sectionReq + " " + " ".join(str(entryItem) for entryItem in entry))
         requestor.write_message("updateSectionList " + " ".join(sectionList))
     except InvalidRequest as ex:
-        requestor.write_message("error " + str(ex))
+        requestor.write_message("Error: " + str(ex))
 
 @handleCommand("UpdateSectionRequest", 2, logMessage=False)
 def updateSectionRequest(requestor, messageList, _unusedTime):
@@ -104,7 +110,7 @@ def updateSectionRequest(requestor, messageList, _unusedTime):
         requestor.write_message("updateSection %s %s %s %s %s"%(sectionReq, sectionId, version, sortValue,
                                                                 base64.b64encode(html).decode()))
     except InvalidRequest as ex:
-        requestor.write_message("error " + str(ex))
+        requestor.write_message("Error: " + str(ex))
 
 @registerSectionHandler("question")
 class QuestionSectionHandler(SectionHandler):
@@ -135,3 +141,41 @@ class AdminAnswersHandler(SectionHandler):
 
     def requestUpdateList(self, requestor):
         return requestor.admin.getAnswerQueueEntries()
+
+@registerSectionHandler("message")
+class TeamMessageLogHandler(SectionHandler):
+    def __init__(self):
+        super().__init__()
+
+    def requestSection(self, requestor, sectionId):
+        try:
+            msgIndex = int(sectionId)
+            if requestor.team:
+                message = requestor.team.messages[msgIndex]
+            elif requestor.admin:
+                message = requestor.admin.messages[msgIndex]
+            else:
+                raise InvalidRequest("Not a team or admin, so no messages to request")
+        except IndexError:
+            if requestor.team:
+                raise InvalidRequest("Requested non-existent team message: %s/%d"%(sectionId, len(requestor.team.messages))) from None
+            if requestor.admin:
+                raise InvalidRequest("Requested non-existent admin message: %s/%d"%(sectionId, len(requestor.admin.messages))) from None
+        except ValueError:
+            raise InvalidRequest("message number %s is not an integeter"%(sectionId)) from None
+        if hasattr(message, "encode"):
+            message = message.encode()
+        return (1, msgIndex, message)
+
+    def requestUpdateList(self, requestor):
+        versionList = []
+        if requestor.team:
+            max = len(requestor.team.messages)
+        elif requestor.admin:
+            max = len(requestor.admin.messages)
+        else:
+            max = 0
+
+        for i in range(max):
+            versionList.append((i, 1))
+        return versionList

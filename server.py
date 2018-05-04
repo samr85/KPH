@@ -20,25 +20,27 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         self.validConnection = False
 
     def open(self):
-        print('connection opened.')
         teamName = self.get_secure_cookie("team", None)
         if teamName:
             teamName = teamName.decode()
+            destString = "team " + teamName
             if teamName in CTX.teams.teamList:
                 self.team = CTX.teams.teamList[teamName]
-                self.team.sendAllNotifications(self)
             else:
+                print('ERROR: Connection opened from non-existent team: %s!'%(teamName))
                 self.write_message("Error: team %s doesn't exist!!"%(teamName))
                 self.sendRefresh()
                 self.close()
                 return
         else: # Can't be both a team and admin
+            destString = "admin"
             admin = self.get_secure_cookie("admin", None)
             if admin:
                 self.admin = adminList
             else:
                 # Correct for eg login page
-                print("Connection is neither team or admin")
+                destString = "no one"
+        print('MSG C : Connection from ' + destString)
         self.validConnection = True
         messageHandler.clients.addClient(self)
 
@@ -54,10 +56,17 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
     def on_close(self):
         messageHandler.clients.removeClient(self)
-        print('connection closed.')
+        dest = ""
+        if self.admin:
+            dest = "admin"
+        elif self.team:
+            dest = "team " + self.team.name
+        else:
+            dest = "no one"
+        print('MSG D : Connection closed from ' + dest)
 
     def write_message(self, message, binary=False):
-        print("MSG Tx: " + (message[:75] + "...") if len(message) > 78 else message)
+        print("MSG Tx: " + ((message[:75] + "...") if len(message) > 78 else message))
         return super().write_message(message, binary)
 
     def sendRefresh(self):
@@ -74,7 +83,7 @@ class TeamRequestHandler(tornado.web.RequestHandler):
             self.redirect("login")
             return
         teamName = teamName.decode()
-        print("Team: %s"%(teamName))
+        print("Request for team page for: %s"%(teamName))
         if teamName in CTX.teams.teamList:
             self.team = CTX.teams.teamList[teamName]
         else:

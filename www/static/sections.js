@@ -1,3 +1,4 @@
+'use strict';
 /*
 list of section types:
 type id
@@ -17,7 +18,7 @@ update section request - requests the above, sent for each section with the wron
 [type, id]
 */
 
-sectionTypes = new Map()
+var sectionTypes = new Map()
 
 class SectionType {
     constructor(name, updateFunction) {
@@ -124,21 +125,21 @@ function updateSectionHandler(msg)
 
 function sortCallback(a, b) { return $(a).data('sort') > $(b).data('sort'); }
 
-function standardSection(holderName) {
-    sectionName = holderName + "Section"
+function standardSection(holderName, modifySectionCallback = undefined) {
+    var sectionName = holderName + "Section"
     function updateStandardSection(id, sortValue, data) {
         console.log("Calling update for section: " + holderName + " for id: " + id);
-        oldSection = $("#" + sectionName + id)
+        var oldSection = $("#" + sectionName + id)
         if (data.length === 0) {
             if (oldSection.length !== 0) {
                 oldSection[0].parentElement.removeChild(oldSection[0])
             }
         }
         else {
+            var section
             if (oldSection.length === 0) {
-                var section = document.createElement("div");
+                section = document.createElement("div");
                 section.id = sectionName + id;
-                section.className = sectionName;
                 var holder = $("#" + holderName);
                 if (holder.length === 0)
                 {
@@ -149,8 +150,12 @@ function standardSection(holderName) {
             else {
                 section = oldSection[0];
             }
+            section.className = sectionName;
             section.innerHTML = data;
             $(section).data('sort', sortValue);
+            if (modifySectionCallback) {
+                modifySectionCallback(section);
+            }
         }
         // SORT
         $('.' + sectionName).sort(sortCallback).appendTo('#' + holderName);

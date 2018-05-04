@@ -1,11 +1,15 @@
 
-#messageLog {
+#messageList {
     height:3.6em;
     line-height: 1.2em;
     overflow-y:auto;
 }
 
-#messageLog .errorMessage {
+#messageList .errorMessage {
     color: red;
     font-weight: bold;
+}
+
+#messageList .adminMessage {
+    color: aqua;
 }
