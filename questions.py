@@ -13,9 +13,9 @@ class Question:
         self.question = "" 
         # How many points are scored for getting the question correct
         # 0 means force the admin to enter a score when marking it
-        self.score = 0
+        self.score = 5
         # If the hint cost isn't specified for individual hints, they cost this much
-        self.defaultHintCost = 0
+        self.defaultHintCost = 1
         # List of the valid answers to the question
         self.answers = []
         # When the question unlocks.  This should be set to either another question,
@@ -39,7 +39,7 @@ class Question:
         """ For debugging questions, prints the question details """
         return json.dumps(self.__dict__, indent=4)
 
-    def unlockDependents(self, team):
+    def completed(self, team):
         """ Called when the question is marked correct to unlock dependent questions"""
         from controller import CTX
         for question in QuestionList.questionList.values():

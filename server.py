@@ -4,6 +4,7 @@ import argparse
 import datetime
 import tornado.web
 import tornado.websocket
+import html
 
 from globalItems import ErrorMessage, startTime
 import messageHandler
@@ -132,21 +133,21 @@ class Login(tornado.web.RequestHandler):
         errorMessages = []
         try:
             if (self.get_argument("QuickLogin", None)):
-                teamName = self.get_argument("QuickLogin")
+                teamName = html.escape(self.get_argument("QuickLogin"))
                 if teamName in CTX.teams.teamList:
                     self.set_secure_cookie("team", teamName)
                     self.redirect("\\teampage")
                     return
                 errorMessages.append("Unknown team: %s"%(teamName))
             elif (self.get_argument("createTeam", None)):
-                teamName = self.get_argument("teamName")
+                teamName = html.escape(self.get_argument("teamName"))
                 # Excepts on error
                 messageHandler.sendDummyMessage("createTeam", [teamName])
                 self.set_secure_cookie("team", teamName)
                 self.redirect("\\teampage")
                 return
             elif (self.get_argument("login", None)):
-                teamName = self.get_argument("teamName")
+                teamName = html.escape(self.get_argument("teamName"))
                 if teamName in CTX.teams.teamList:
                     self.set_secure_cookie("team", teamName)
                     self.redirect("\\teampage")

@@ -1,5 +1,6 @@
 import datetime
 import base64
+import html
 
 from globalItems import ErrorMessage
 from commandRegistrar import commands, handleCommand
@@ -43,7 +44,7 @@ class MessagingClients:
 clients = MessagingClients()
 
 def handleMessage(server, message):
-    mList = message.split()
+    mList = html.escape(message).split()
     if mList:
         if mList[0] in commands:
             commands[mList[0]].checkAndRun(server, mList[1:], datetime.datetime.now())
@@ -56,7 +57,7 @@ def ping(server, _messageList, _time):
 
 @handleCommand("subAnswer", 2, teamRequired=True)
 def submitAnswer(server, messageList, time):
-    answer = base64.b64decode(messageList[1]).decode()
+    answer = html.escape(base64.b64decode(messageList[1]).decode())
     server.team.submitAnswer(messageList[0], answer, time)
 
 @handleCommand("reqHint", 1, teamRequired=True)

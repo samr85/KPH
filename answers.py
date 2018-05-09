@@ -72,7 +72,7 @@ class Answer:
                 self.score = self.question.score
             else:
                 self.score = score
-            self.question.unlockDependents(self.team)
+            self.question.completed(self.team)
         else:
             self.status = INCORRECT
             self.team.notifyTeam("%s answer: INCORRECT :("%(self.question.name))
@@ -93,12 +93,19 @@ class Answer:
         return (self.version, 0, None)
 
     def requestHint(self):
+        if self.correct():
+            raise ErrorMessage("Attempting to request a hint for an already correct question")
         if self.hintCount < len(self.question.hints):
             self.hintCount += 1
             self.team.notifyTeam("Hint for question %s unlocked"%(self.question.name))
             self.update()
         else:
             raise ErrorMessage("All hints already requested")
+
+    def requestAllHints(self):
+        if not self.correct():
+            self.hintCount = len(self.question.hints)
+            self.update()
 
     def getCurrentHintCost(self):
         hintCost = 0

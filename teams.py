@@ -1,8 +1,9 @@
 from threading import RLock, Lock
 import datetime
 import collections
-import sections
+import html
 
+import sections
 from globalItems import ErrorMessage, startTime
 from commandRegistrar import handleCommand
 
@@ -74,6 +75,7 @@ class TeamList:
 
     def createTeam(self, name):
         with self.lock:
+            name = html.escape(name)
             if name in self.teamList:
                 raise ErrorMessage("A team of that name already exists")
             print("Creating new team: %s"%(name))
