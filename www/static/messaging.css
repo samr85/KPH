@@ -23,3 +23,7 @@
     color: darkred;
     font-weight: bold;
 }
+
+#countdownTime > pre {
+    display: inline-block;
+}

@@ -5,6 +5,8 @@ import time
 import contextlib
 import traceback
 
+from sections import registerSectionHandler, SectionHandler
+
 class PuzzleScheduler:
     TriggerEvent = collections.namedtuple("TriggerEvent", ["callTime", "callback", "args", "kwargs"])
 
@@ -18,6 +20,7 @@ class PuzzleScheduler:
     def _schedulerMain(self):
         runNow = None
         while True:
+            #print("start scheduler loop")
             if runNow:
                 try:
                     runNow.callback(*runNow.args, **runNow.kwargs)
@@ -28,6 +31,7 @@ class PuzzleScheduler:
 
             self._waitsModified.clear()
             if not self._events:
+                #print("Waiting on _waits")
                 self._waitsModified.wait()
             else:
                 with self._lock:
@@ -36,9 +40,9 @@ class PuzzleScheduler:
                     if firstEvent.callTime < curTime:
                         runNow = self._events.pop(0)
                         continue
-                    timediff = curTime - firstEvent.callTime
-                    timediff = datetime.timedelta()
-                time.sleep(timediff.total_seconds())
+                    timediff = firstEvent.callTime - curTime
+                #print("Sleeping for %d"%(timediff.total_seconds()))
+                self._waitsModified.wait(timediff.total_seconds())
 
     def schedule(self, timeAbsolute, callback, args=(), kwargs={}):
         if self._reloading:
@@ -63,6 +67,33 @@ def runIn(timeOffset, callback, args=(), kwargs={}):
 
 def runAt(timeAbsolute, callback, args=(), kwargs={}):
     PUZZLE_SCHEDULER.schedule(timeAbsolute, callback, args, kwargs)
+
+COUNTDOWN_MESSAGE_STRING = None
+COUNTDOWN_MESSAGE_TIME = None
+COUNTDOWN_MESSAGE_VERSION = 0
+
+def displayCountdown(messageString, timeOffset = None, timeAbsolute = None):
+    if timeOffset:
+        timeAbsolute = datetime.datetime.now() + datetime.timedelta(seconds=timeOffset)
+    global COUNTDOWN_MESSAGE_STRING, COUNTDOWN_MESSAGE_TIME, COUNTDOWN_MESSAGE_VERSION 
+    COUNTDOWN_MESSAGE_STRING = messageString.encode()
+    COUNTDOWN_MESSAGE_TIME = timeAbsolute.isoformat().encode()
+    COUNTDOWN_MESSAGE_VERSION += 1
+
+@registerSectionHandler("countdown")
+class countdownSectionHandler(SectionHandler):
+    def __init__(self):
+        super().__init__()
+
+    def requestSection(self, requestor, sectionId):
+        if sectionId == "0":
+            return (COUNTDOWN_MESSAGE_VERSION, 0, COUNTDOWN_MESSAGE_STRING)
+        else:
+            return (COUNTDOWN_MESSAGE_VERSION, datetime.datetime.now().isoformat(), COUNTDOWN_MESSAGE_TIME)
+
+    def requestUpdateList(self, requestor):
+        return [(0, COUNTDOWN_MESSAGE_VERSION), 
+                (1, COUNTDOWN_MESSAGE_VERSION)]
 
 # example:
 #def fn(a, b=None, c=None):
