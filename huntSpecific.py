@@ -4,6 +4,12 @@ import scheduler
 from controller import CTX
 from commandRegistrar import handleCommand
 
+#Called when the server is loading up.  Only function in here that is called automatically.
+# Reloading is set if the server was started with a previous messages file.  Called before any messages are loaded.
+#  Will need to work out exactly what state we should be in, so any timers created here need to be worked out somehow
+#  I've not fully worked through how this needs to work yet.
+# If teams are to be registered in advance, register them here
+# Questions should be loaded from here, and this should initiate whatever method is used to allow teams to see the questions
 def initialise(reloading=False):
     print("Initialising")
 
@@ -15,6 +21,7 @@ def initialise(reloading=False):
     else:
         scheduler.runIn(5, startHunt)
 
+# Dummy examples of roughly what we might want this file to look like
 def loadQuestionList():
     import dummyQuestionList
 
@@ -22,6 +29,7 @@ def loadTeamList():
     CTX.teams.createTeam("aa")
     CTX.teams.createTeam("<b>b'b")
 
+# Use @handleCommand if you want to be able to send any messages to this code from the browsers.
 @handleCommand("startHunt", adminRequired=True)
 def startHunt():
     print("Hunt is starting!!!")

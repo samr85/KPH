@@ -1,9 +1,10 @@
 'use strict'
-var countdownTarget
-var countdownTimeOffset
-var countdownString
-var countdownInterval
+var countdownTarget /* Time that we should be counting down to */
+var countdownTimeOffset /* Time difference between this browser and the server */
+var countdownString /* Message to display with the countdown */
+var countdownInterval /* Reference to the interval which countdownTick is called on */
 
+/* Create a numbers array, which is a HTML element containing the ascii art for each number, or colon */
 var numFull = String.raw`/¯¯\  /|  /¯¯\ /¯¯\  /|  |¯¯¯ /¯¯\ |¯¯| /¯¯\ /¯¯\      ` +
               String.raw`|  |   |    _/  __/ /_|_ |__  |__     / \__/ \__|   o  ` +
               String.raw`|  |   |   /      \   |     \ |  \   |  /  \    |   o  ` +
@@ -18,6 +19,7 @@ for (i = 0; i < 11; i++) {
         nextNum += numFull.substring(index, index + 5) + "\n";
     }
     nextNum += "</pre>";
+    /* This character just shows up as a box on webpages, so convert to the entity that it represents so it displays ok */
     nextNum = nextNum.replace(/¯/g, "&macr;");
     numbers.push($(nextNum));
 }
@@ -46,6 +48,9 @@ function countdownTick() {
     countdownDiv.append(numbers[ss % 10].clone())
 }
 
+
+/* This section is unique, id of 0 is the string to display, id of 1 is the time we need to count down to.
+  The sortValue of id 1 is the current time on the server, which we can diff to stay in sync even if our clocks are bad */
 function updateCountdown(id, sortValue, data) {
     if (id == 0) {
         countdownString = data;
@@ -68,5 +73,4 @@ function updateCountdown(id, sortValue, data) {
         $("#countdownDiv").empty();
     }
 }
-
 initialiseSection("countdown", updateCountdown, []);

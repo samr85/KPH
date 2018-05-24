@@ -6,10 +6,12 @@ from globalItems import ErrorMessage
 
 commands = {}
 
+# Called to initialise command message logging
 def setMessageFile(file):
     print("Logging messages to %s"%(file.name))
     Command.logFile = file
 
+# Class responsible for running @handleCommand functions
 class Command:
     logFile = None
     logLock = Lock()
@@ -56,7 +58,19 @@ class Command:
         Command.logFile.write("\n")
         Command.logFile.flush()
 
-def handleCommand(command, messageListLen=-1, teamRequired=False, adminRequired=False, logMessage=True):
+#Expsects to be called as a decorator, eg:
+#@handleCommand("nameSentFromBrowser", ...)
+#def blah(server, messageList, timeOfCall):
+#Server is used to extract team if that's specified,
+# check if the user is an admin (though if adminRequired was set this has already been done)
+# Reply to this specific client - probably only to be used for error messages
+#messageList is a list of what data was sent by the client for this call
+#timeOfCall should be used if you need to check time instead of datetime.datetime.now(), as the message might be being replayed, so this is the time of that original call
+def handleCommand(command, # Name to identify this in message from the browser
+                  messageListLen=-1, # Message must have been split into exactly this number of chunks - if not, an error will be returned instead
+                  teamRequired=False, adminRequired=False, # mutually exclusive.  teamRequired means server.team must be set.  adminRequired means server.admin must be true.
+                  logMessage=True # If set to False, then this won't be written to the logfile, so can't be replayed.
+                  ):
     def handleCommandInt(function):
         commands[command] = Command(command, logMessage, function, messageListLen, teamRequired, adminRequired)
         return function

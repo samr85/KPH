@@ -3,6 +3,9 @@ import abc
 from commandRegistrar import handleCommand
 import tornado
 
+# Sections are the way for list of items on the page to be always kept in sync with what they should show automatically.
+
+# Create a new instalce of this class, and overload the 2 abstractmethod functions.  Register the class using @registerSectionHandler("nameOfSection")
 class SectionHandler(abc.ABC):
     def __init__(self):
         self.requireTeam = False
@@ -32,6 +35,7 @@ class SectionHandler(abc.ABC):
 
     @abc.abstractmethod
     def requestUpdateList(self, requestor):
+        # This function is called by the browser when it wants to know if there is any additional information to look up.
         #return [(id, version), ...]
         return []
 
