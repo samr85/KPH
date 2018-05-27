@@ -141,7 +141,7 @@ class Login(tornado.web.RequestHandler):
                 raise ErrorMessage("Please specify a team")
 
             # Excepts an ErrorMessage on error
-            team = CTX.teams.getTeam(teamName, password)
+            CTX.teams.getTeam(teamName, password)
             self.set_secure_cookie("team", teamName)
             self.redirect("\\teampage")
             return

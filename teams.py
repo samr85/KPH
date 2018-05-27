@@ -15,6 +15,7 @@ class Team:
         self.messages = []
         self.lock = RLock()
         self.messagingClients = []
+        self.penalty = 0
         # NOTE: very bad practice if teams were allowed to pick passwords
         self.password = password
 
@@ -43,6 +44,7 @@ class Team:
                 score += thisScore
                 if answer.answeredTime < lastScoreTime:
                     lastScoreTime = answer.answeredTime
+        score -= self.penalty
         return lastScoreTime, score
 
     def getScoreHistory(self):
@@ -114,3 +116,12 @@ def createTeam(server, messageList, _time):
         server.team = CTX.teams.createTeam(messageList[0], None)
     elif len(messageList) == 2:
         server.team = CTX.teams.createTeam(messageList[0], messageList[1])
+
+@handleCommand("setTeamPenalty", messageListLen=3, adminRequired=True)
+def setTeamPenalty(_server, messageList, _time):
+    teamName = messageList[0]
+    scorePenalty = int(messageList[1])
+    reason = messageList[2]
+    team = CTX.teams.getTeam(teamName)
+    team.penalty = scorePenalty
+    team.notifyTeam("You have been given a penalty of %d points for %s"%(scorePenalty, reason))

@@ -14,7 +14,7 @@ class HuntContext:
         import admin
         import questions
         import answers
-        self.questions = questions.QuestionList() 
+        self.questions = questions.QuestionList()
         self.teams = teams.TeamList()
         self.admin = admin.AdminList()
         self.answerQueue = answers.AnswerSubmissionQueue()
