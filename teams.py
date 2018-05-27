@@ -6,14 +6,17 @@ import html
 import sections
 from globalItems import ErrorMessage, startTime
 from commandRegistrar import handleCommand
+from controller import CTX
 
 class Team:
-    def __init__(self, name):
+    def __init__(self, name, password):
         self.name = name
         self.questionAnswers = {}
         self.messages = []
         self.lock = RLock()
         self.messagingClients = []
+        # NOTE: very bad practice if teams were allowed to pick passwords
+        self.password = password
 
     def notifyTeam(self, message):
         self.messages.append(message)
@@ -60,8 +63,8 @@ class Team:
             return self.questionAnswers[questionId].renderQuestion()
         raise ErrorMessage("Invalid question: %s"%(questionId))
 
-def datetimeToJsString(dt):
-    return  str(tuple([i for i in dt.timetuple()][:6]))
+def datetimeToJsString(dtime):
+    return str(tuple([i for i in dtime.timetuple()][:6]))
 
 class TeamScore:
     def __init__(self, team):
@@ -73,20 +76,23 @@ class TeamList:
         self.lock = Lock()
         self.teamList = {}
 
-    def createTeam(self, name):
+    def createTeam(self, name, password):
         with self.lock:
             name = html.escape(name)
             if name in self.teamList:
                 raise ErrorMessage("A team of that name already exists")
             print("Creating new team: %s"%(name))
-            newTeam = Team(name)
+            newTeam = Team(name, password)
             self.teamList[name] = newTeam
             return newTeam
 
-    def getTeam(self, name):
+    def getTeam(self, name, password=None):
         with self.lock:
             if name in self.teamList:
-                return self.teamList[name]
+                team = self.teamList[name]
+                if password != None and password != team.password:
+                    raise ErrorMessage("Invalid password")
+                return team
             else:
                 raise ErrorMessage("Team %s doesn't exist!"%(name))
 
@@ -102,7 +108,9 @@ class TeamList:
             scoreHistory[teamName] = self.teamList[teamName].getScoreHistory()
         return scoreHistory
 
-@handleCommand("createTeam", 1)
+@handleCommand("createTeam")
 def createTeam(server, messageList, _time):
-    from controller import CTX
-    server.team = CTX.teams.createTeam(messageList[0])
+    if len(messageList) == 1:
+        server.team = CTX.teams.createTeam(messageList[0], None)
+    elif len(messageList) == 2:
+        server.team = CTX.teams.createTeam(messageList[0], messageList[1])

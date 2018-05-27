@@ -1,0 +1,25 @@
+{% extends "basepage.html" %}
+{% autoescape None %}
+
+{%block title%}Insecure Login{%end%}
+
+{%block contents %}
+
+<div id="Errors">
+    {% for error in Errors %}
+    <span class="ErrorMessage">{{error}}</span>
+    {%end%}
+</div>
+
+<b>insecure login: MUST DISABLE FOR LIVE</b><br />
+<div id="teamList">
+    <form method="post">
+        <input name="teamName" type="text" />
+        <input name="createTeam" type="submit" value="create team" />
+        <input name="login" type="submit" value="Log in" /><br />
+        <input name="admin" type="submit" value="Admin" /> <br />
+        {{ getTeamQuickLogin() }}
+    </form>
+</div>
+
+{%end%}

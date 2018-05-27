@@ -2,16 +2,16 @@ import threading
 import os.path
 import argparse
 import datetime
+import html
+
 import tornado.web
 import tornado.websocket
-import html
 
 from globalItems import ErrorMessage, startTime
 import messageHandler
 import commandRegistrar
 import huntSpecific
 from controller import CTX
-from admin import adminList
 
 class WSHandler(tornado.websocket.WebSocketHandler):
     def __init__(self, *args, **kwargs):
@@ -37,13 +37,13 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             destString = "admin"
             admin = self.get_secure_cookie("admin", None)
             if admin:
-                self.admin = adminList
+                self.admin = CTX.admin
             else:
                 # Correct for eg login page
                 destString = "no one"
         print('MSG C : Connection from ' + destString)
         self.validConnection = True
-        messageHandler.clients.addClient(self)
+        CTX.messagingClients.addClient(self)
 
     def on_message(self, message):
         if not self.validConnection:
@@ -56,7 +56,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             self.write_message("Error: %s"%(ex.message))
 
     def on_close(self):
-        messageHandler.clients.removeClient(self)
+        CTX.messagingClients.removeClient(self)
         dest = ""
         if self.admin:
             dest = "admin"
@@ -121,9 +121,43 @@ class Login(tornado.web.RequestHandler):
     def get(self):
         self.clear_cookie("team")
         self.clear_cookie("admin")
-        self.render("www\\login.html", getTeamQuickLogin=self.getTeamQuickLogin, Errors=[])
+        self.render("www\\login.html", Errors=[], CTX=CTX)
 
-    def getTeamQuickLogin(self):
+    def post(self):
+        errorMessages = []
+        try:
+            teamName = self.get_argument("teamSelect", None)
+            teamName = html.escape(teamName)
+            password = self.get_argument("teamPassword", None)
+            if not password:
+                raise ErrorMessage("Please specify a password")
+
+            if not teamName:
+                # Was this an admin login?
+                if password == CTX.admin.password:
+                    self.set_secure_cookie("admin", "1")
+                    self.redirect("\\admin")
+                    return
+                raise ErrorMessage("Please specify a team")
+
+            # Excepts an ErrorMessage on error
+            team = CTX.teams.getTeam(teamName, password)
+            self.set_secure_cookie("team", teamName)
+            self.redirect("\\teampage")
+            return
+
+        except ErrorMessage as ex:
+            errorMessages.append(ex.message)
+        self.render("www\\login.html", Errors=errorMessages, CTX=CTX)
+
+class TestLogin(tornado.web.RequestHandler):
+    def get(self):
+        self.clear_cookie("team")
+        self.clear_cookie("admin")
+        self.render("www\\testLogin.html", getTeamQuickLogin=self.getTeamQuickLogin, Errors=[], CTX=CTX)
+
+    @staticmethod
+    def getTeamQuickLogin():
         retHTML = ""
         for team in CTX.teams.teamList:
             retHTML += "<input name='QuickLogin' type='Submit' value='%s' /><br />"%(team)
@@ -132,34 +166,34 @@ class Login(tornado.web.RequestHandler):
     def post(self):
         errorMessages = []
         try:
-            if (self.get_argument("QuickLogin", None)):
+            if self.get_argument("QuickLogin", None):
                 teamName = html.escape(self.get_argument("QuickLogin"))
                 if teamName in CTX.teams.teamList:
                     self.set_secure_cookie("team", teamName)
                     self.redirect("\\teampage")
                     return
                 errorMessages.append("Unknown team: %s"%(teamName))
-            elif (self.get_argument("createTeam", None)):
+            elif self.get_argument("createTeam", None):
                 teamName = html.escape(self.get_argument("teamName"))
                 # Excepts on error
                 messageHandler.sendDummyMessage("createTeam", [teamName])
                 self.set_secure_cookie("team", teamName)
                 self.redirect("\\teampage")
                 return
-            elif (self.get_argument("login", None)):
+            elif self.get_argument("login", None):
                 teamName = html.escape(self.get_argument("teamName"))
                 if teamName in CTX.teams.teamList:
                     self.set_secure_cookie("team", teamName)
                     self.redirect("\\teampage")
                     return
                 errorMessages.append("Unknown team: %s"%(teamName))
-            elif (self.get_argument("admin", None)):
+            elif self.get_argument("admin", None):
                 self.set_secure_cookie("admin", "1")
                 self.redirect("\\admin")
                 return
         except ErrorMessage as ex:
             errorMessages.append(ex.message)
-        self.render("www\\login.html", getTeamQuickLogin=self.getTeamQuickLogin, Errors=errorMessages)
+        self.render("www\\testLogin.html", getTeamQuickLogin=self.getTeamQuickLogin, Errors=errorMessages)
 
 
 def startServer():
@@ -194,14 +228,19 @@ def initilise():
         "cookie_secret": "123",
         "autoreload": False
         }
-    application = tornado.web.Application([
-        (r"/", Login),
+    pageList = [
         (r"/ws", WSHandler),
         (r"/login", Login),
         (r"/teampage", TeamPage),
         (r"/admin", AdminPage),
         (r"/score", ScorePage)
-        ], **settings)
+        ]
+    if CTX.enableInsecure:
+        pageList.append((r"/testLogin", TestLogin))
+        pageList.append((r"/", TestLogin))
+    else:
+        pageList.append((r"/", Login))
+    application = tornado.web.Application(pageList, **settings)
     application.listen(args.port)
 
     startServer()

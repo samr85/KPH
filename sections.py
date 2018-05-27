@@ -1,7 +1,8 @@
 import base64
 import abc
-from commandRegistrar import handleCommand
 import tornado
+
+from commandRegistrar import handleCommand
 
 # Sections are the way for list of items on the page to be always kept in sync with what they should show automatically.
 
@@ -30,8 +31,7 @@ class SectionHandler(abc.ABC):
             return self.requestors
         if requestorSubset == "admin":
             return [x for x in self.requestors if x.admin]
-        else:
-            return [x for x in self.requestors if x.team == requestorSubset]
+        return [x for x in self.requestors if x.team == requestorSubset]
 
     @abc.abstractmethod
     def requestUpdateList(self, requestor):
@@ -44,12 +44,12 @@ class SectionHandler(abc.ABC):
         #return (version, sortValue, content)
         return None
 
-sectionHandlers = {}
+SECTION_HANDLERS = {}
 
 def registerSectionHandler(sectionId):
     """Register this class as a handler for the named section"""
     def registerSectionHandlerInt(handlerClass):
-        sectionHandlers[sectionId] = handlerClass()
+        SECTION_HANDLERS[sectionId] = handlerClass()
         return handlerClass
     return registerSectionHandlerInt
 
@@ -57,9 +57,9 @@ class InvalidRequest(Exception):
     pass
 
 def getSectionHandler(sectionName):
-    if sectionName not in sectionHandlers:
+    if sectionName not in SECTION_HANDLERS:
         raise InvalidRequest("Unknown section: %s"%(sectionName))
-    return sectionHandlers[sectionName]
+    return SECTION_HANDLERS[sectionName]
 
 def getCheckSectionHandler(sectionName, requestor):
     sectionReqHandler = getSectionHandler(sectionName)
@@ -148,9 +148,6 @@ class AdminAnswersHandler(SectionHandler):
 
 @registerSectionHandler("message")
 class TeamMessageLogHandler(SectionHandler):
-    def __init__(self):
-        super().__init__()
-
     def requestSection(self, requestor, sectionId):
         try:
             msgIndex = int(sectionId)
@@ -174,12 +171,12 @@ class TeamMessageLogHandler(SectionHandler):
     def requestUpdateList(self, requestor):
         versionList = []
         if requestor.team:
-            max = len(requestor.team.messages)
+            numMsgs = len(requestor.team.messages)
         elif requestor.admin:
-            max = len(requestor.admin.messages)
+            numMsgs = len(requestor.admin.messages)
         else:
-            max = 0
+            numMsgs = 0
 
-        for i in range(max):
+        for i in range(numMsgs):
             versionList.append((i, 1))
         return versionList

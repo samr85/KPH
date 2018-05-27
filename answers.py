@@ -6,6 +6,8 @@ import tornado
 from globalItems import ErrorMessage
 import sections
 
+from controller import CTX
+
 SECTION_LOADER = tornado.template.Loader("www/sections")
 INCORRECT = 0
 SUBMITTED = 1
@@ -53,7 +55,7 @@ class Answer:
             raise ErrorMessage("Cannot submit answer to disabled question")
         if self.status == INCORRECT:
             self.answer = answer
-            answerQueue.queueAnswer(self)
+            CTX.answerQueue.queueAnswer(self)
             self.status = SUBMITTED
             if time:
                 self.answeredTime = time
@@ -167,6 +169,3 @@ class AnswerSubmissionQueue:
             for answer in self.answerList:
                 entriesList.append((answer.id, answer.version))
         return entriesList
-
-
-answerQueue = AnswerSubmissionQueue()

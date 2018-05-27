@@ -4,7 +4,7 @@ from threading import Lock
 
 from globalItems import ErrorMessage
 
-commands = {}
+COMMANDS = {}
 
 # Called to initialise command message logging
 def setMessageFile(file):
@@ -70,8 +70,8 @@ def handleCommand(command, # Name to identify this in message from the browser
                   messageListLen=-1, # Message must have been split into exactly this number of chunks - if not, an error will be returned instead
                   teamRequired=False, adminRequired=False, # mutually exclusive.  teamRequired means server.team must be set.  adminRequired means server.admin must be true.
                   logMessage=True # If set to False, then this won't be written to the logfile, so can't be replayed.
-                  ):
+                 ):
     def handleCommandInt(function):
-        commands[command] = Command(command, logMessage, function, messageListLen, teamRequired, adminRequired)
+        COMMANDS[command] = Command(command, logMessage, function, messageListLen, teamRequired, adminRequired)
         return function
     return handleCommandInt

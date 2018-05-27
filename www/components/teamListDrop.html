@@ -1,0 +1,7 @@
+{% autoescape None %}
+
+<select name="teamSelect">
+{%for teamName in CTX.teams.teamList%}
+    <option value="{{teamName}}">{{teamName}}</option>
+{%end%}
+</select>

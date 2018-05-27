@@ -2,6 +2,8 @@ from threading import Lock
 import json
 import collections
 
+from controller import CTX
+
 class Question:
     """ Class holding the questions for the hunt.
         Wrap question classes in @registerQuestion"""
@@ -10,7 +12,7 @@ class Question:
         # The name of the questions, is displayed to the user
         self.name = self.__class__.__name__.replace("_", " ")
         # The text of the questions, displays to the user if set
-        self.question = "" 
+        self.question = ""
         # How many points are scored for getting the question correct
         # 0 means force the admin to enter a score when marking it
         self.score = 5
@@ -41,7 +43,6 @@ class Question:
 
     def completed(self, team):
         """ Called when the question is marked correct to unlock dependent questions"""
-        from controller import CTX
         for question in QuestionList.questionList.values():
             if question.unlockOn == self.__class__:
                 print("unlocking %s for team %s"%(question.name, team.name))
@@ -53,9 +54,9 @@ class QuestionList:
 
     @staticmethod
     def registerQuestion(question):
-        q = question()
+        newQ = question()
         with QuestionList.lock:
-            QuestionList.questionList[q.name] = q
+            QuestionList.questionList[newQ.name] = newQ
         return question
 
 registerQuestion = QuestionList.registerQuestion

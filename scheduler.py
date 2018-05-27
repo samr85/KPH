@@ -1,7 +1,6 @@
 import threading
 import collections
 import datetime
-import time
 import contextlib
 import traceback
 
@@ -24,8 +23,8 @@ class PuzzleScheduler:
             if runNow:
                 try:
                     runNow.callback(*runNow.args, **runNow.kwargs)
-                except Exception as e:
-                    print("Exception in timer callback: " + str(e))
+                except Exception as ex:
+                    print("Exception in timer callback: " + str(ex))
                     traceback.print_exc()
                 runNow = None
 
@@ -72,27 +71,23 @@ COUNTDOWN_MESSAGE_STRING = None
 COUNTDOWN_MESSAGE_TIME = None
 COUNTDOWN_MESSAGE_VERSION = 0
 
-def displayCountdown(messageString, timeOffset = None, timeAbsolute = None):
+def displayCountdown(messageString, timeOffset=None, timeAbsolute=None):
     if timeOffset:
         timeAbsolute = datetime.datetime.now() + datetime.timedelta(seconds=timeOffset)
-    global COUNTDOWN_MESSAGE_STRING, COUNTDOWN_MESSAGE_TIME, COUNTDOWN_MESSAGE_VERSION 
+    global COUNTDOWN_MESSAGE_STRING, COUNTDOWN_MESSAGE_TIME, COUNTDOWN_MESSAGE_VERSION
     COUNTDOWN_MESSAGE_STRING = messageString.encode()
     COUNTDOWN_MESSAGE_TIME = timeAbsolute.isoformat().encode()
     COUNTDOWN_MESSAGE_VERSION += 1
 
 @registerSectionHandler("countdown")
-class countdownSectionHandler(SectionHandler):
-    def __init__(self):
-        super().__init__()
-
+class CountdownSectionHandler(SectionHandler):
     def requestSection(self, requestor, sectionId):
         if sectionId == "0":
             return (COUNTDOWN_MESSAGE_VERSION, 0, COUNTDOWN_MESSAGE_STRING)
-        else:
-            return (COUNTDOWN_MESSAGE_VERSION, datetime.datetime.now().isoformat(), COUNTDOWN_MESSAGE_TIME)
+        return (COUNTDOWN_MESSAGE_VERSION, datetime.datetime.now().isoformat(), COUNTDOWN_MESSAGE_TIME)
 
     def requestUpdateList(self, requestor):
-        return [(0, COUNTDOWN_MESSAGE_VERSION), 
+        return [(0, COUNTDOWN_MESSAGE_VERSION),
                 (1, COUNTDOWN_MESSAGE_VERSION)]
 
 # example:

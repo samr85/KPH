@@ -1,4 +1,4 @@
-﻿{% extends "basepage.html" %}
+{% extends "basepage.html" %}
 {% autoescape None %}
 
 {%block title%}Login{%end%}
@@ -13,11 +13,9 @@
 
 <div id="teamList">
     <form method="post">
-        <input name="teamName" type="text" />
-        <input name="createTeam" type="submit" value="create team" />
-        <input name="login" type="submit" value="Log in" /><br />
-        <input name="admin" type="submit" value="Admin" /> <br />
-        {{ getTeamQuickLogin() }}
+        {% include components/teamListRadio.html %}
+        <input type="password" name="teamPassword" /><br />
+        <input type="submit" value="login" />
     </form>
 </div>
 

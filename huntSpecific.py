@@ -16,6 +16,10 @@ def initialise(reloading=False):
     loadQuestionList()
     loadTeamList()
 
+    # TODO: DISABLE FOR LIVE
+    CTX.enableInsecure = True
+    CTX.admin.password = "1"
+
     if reloading:
         startHunt()
     else:
@@ -26,8 +30,8 @@ def loadQuestionList():
     import dummyQuestionList
 
 def loadTeamList():
-    CTX.teams.createTeam("aa")
-    CTX.teams.createTeam("<b>b'b")
+    CTX.teams.createTeam("aa", "a")
+    CTX.teams.createTeam("<b>b'b", "b")
 
 # Use @handleCommand if you want to be able to send any messages to this code from the browsers.
 @handleCommand("startHunt", adminRequired=True)

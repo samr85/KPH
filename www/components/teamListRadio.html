@@ -1,0 +1,5 @@
+{% autoescape None %}
+
+{%for teamName in CTX.teams.teamList%}
+<input type="radio" name="teamSelect" value="{{teamName}}" id="{{teamName}}Radio"/><label for="{{teamName}}Radio">{{teamName}}</label><br />
+{%end%}
