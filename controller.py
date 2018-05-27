@@ -25,6 +25,7 @@ class HuntContext:
         self.enableInsecure = False
 
     def importMessages(self, inputFile):
+        """ For when restarting the server with a log of previous events """
         for line in inputFile:
             messageDict = json.loads(line)
             if "team" in messageDict:
@@ -40,6 +41,7 @@ class HuntContext:
             messageHandler.sendDummyMessage(messageDict["message"], messageDict["messageList"], team, admin, msgTime)
 
     def enableQuestion(self, question, team=None):
+        """ Makes the question available to specified team (or all) """
         if not team:
             for teamIt in self.teams.teamList.values():
                 self.enableQuestion(question, teamIt)
@@ -51,6 +53,7 @@ class HuntContext:
         sections.pushSection("question", question.id, team)
 
     def disableQuestion(self, question, team=None):
+        """ Specific (or all) team can no submit answers to this question """
         if not team:
             for teamIt in self.teams.teamList.values():
                 self.disableQuestion(question, teamIt)

@@ -49,6 +49,7 @@ class Question:
                 CTX.enableQuestion(question, team)
 
 class QuestionList:
+    """ A container holding of all questions in the hunt """
     questionList = collections.OrderedDict()
     lock = Lock()
 

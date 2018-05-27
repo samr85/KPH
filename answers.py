@@ -14,6 +14,7 @@ SUBMITTED = 1
 CORRECT = 2
 
 class Answer:
+    """ Class linking a team to a question.  Holds what they've done to it, eg requesting hints, submitting answers """
     nextID = [0]
     idLock = Lock()
 
@@ -82,11 +83,13 @@ class Answer:
         self.update()
 
     def renderQuestion(self):
+        """ Create the HTML to display this to the user """
         version = self.version
         html = SECTION_LOADER.load("question.html").generate(answer=self)
         return (version, self.question.id, html)
 
     def renderAnswerQueue(self):
+        """ Create the HTML to display this to an admin """
         if self.awaitingAnswer():
             version = self.version
             html = SECTION_LOADER.load("answerQueue.html").generate(answer=self)
@@ -105,6 +108,7 @@ class Answer:
             raise ErrorMessage("All hints already requested")
 
     def requestAllHints(self):
+        """ Admin function to mark all hints as requested """
         if not self.correct():
             self.hintCount = len(self.question.hints)
             self.update()
@@ -116,6 +120,7 @@ class Answer:
         return hintCost
 
     def getScore(self):
+        """ Return how many points this question is worth """
         if self.status == CORRECT:
             hintCost = self.getCurrentHintCost()
             if self.score > hintCost:
@@ -123,12 +128,14 @@ class Answer:
         return 0
 
 class AnswerSubmissionQueue:
+    """ A list of answers that teams have submitted for answering """
     answerList = collections.deque()
 
     def __init__(self):
         self.lock = Lock()
 
     def queueAnswer(self, newAnswer):
+        """ Team is wanting a question to be marked """
         with self.lock:
             for answer in self.answerList:
                 if answer.team == newAnswer.team:
@@ -136,6 +143,7 @@ class AnswerSubmissionQueue:
             self.answerList.append(newAnswer)
 
     def markAnswer(self, teamName, questionId, mark, value=0):
+        """ Admin has replied to the mark request """
         found = False
         with self.lock:
             for answer in self.answerList:
@@ -151,6 +159,7 @@ class AnswerSubmissionQueue:
             raise ErrorMessage("Answer not found to mark!")
 
     def renderEntry(self, answerId):
+        """ Make the sectionHTML for showing this answer request to admins """
         try:
             answerId = int(answerId)
         except ValueError:
@@ -164,6 +173,7 @@ class AnswerSubmissionQueue:
         return (0, 0, None)
 
     def getEntries(self):
+        """ Get a list of all the answer requests """
         entriesList = []
         with self.lock:
             for answer in self.answerList:

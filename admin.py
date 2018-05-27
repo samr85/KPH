@@ -5,6 +5,7 @@ import sections
 from controller import CTX
 
 class AdminList:
+    """ Structure holding information for admins """
     def __init__(self):
         self.messagingClients = []
         self.messages = []
@@ -24,6 +25,7 @@ class AdminList:
 
 @handleCommand("markAnswer", adminRequired=True)
 def markAnswer(_server, messageList, _time):
+    """ Message from the admins specifying if submitted answer is correct or not """
     # messageList = teamName questionName correct/incorrect [mark]
     if len(messageList) == 3:
         CTX.answerQueue.markAnswer(messageList[0], messageList[1], messageList[2].lower() == "correct", 0)
@@ -38,11 +40,13 @@ def markAnswer(_server, messageList, _time):
 
 @handleCommand("messageAdmin", teamRequired=True)
 def teamMessageAdmin(server, messageList, _time):
+    """ Send a message from a team to the admins.  Possibly disable? """
     CTX.admin.messageAdmin("Team Message: %s: %s"%(server.team.name, " ".join(messageList)))
     server.team.notifyTeam("Message Sent: %s"%(" ".join(messageList)))
 
 @handleCommand("messageTeam", adminRequired=True)
 def adminMessageTeam(_server, messageList, _time):
+    """ Send a message from the admins to either a specific team or all teams """
     teamName = messageList[0]
     message = " ".join(messageList[1:])
     if teamName == "all":

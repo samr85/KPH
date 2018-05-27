@@ -79,16 +79,20 @@ class TeamList:
         self.teamList = {}
 
     def createTeam(self, name, password):
+        """ Make a new team """
         with self.lock:
             name = html.escape(name)
             if name in self.teamList:
                 raise ErrorMessage("A team of that name already exists")
+            if name.lower() in ["all", "admin"]:
+                raise ErrorMessage("Team name %s is not allowed"%(name))
             print("Creating new team: %s"%(name))
             newTeam = Team(name, password)
             self.teamList[name] = newTeam
             return newTeam
 
     def getTeam(self, name, password=None):
+        """ Get the team structure from the name.  Check the team's password if one is given """
         with self.lock:
             if name in self.teamList:
                 team = self.teamList[name]
@@ -112,6 +116,7 @@ class TeamList:
 
 @handleCommand("createTeam")
 def createTeam(server, messageList, _time):
+    """ Currenly unused, as createTeam is called from huntSpecific """
     if len(messageList) == 1:
         server.team = CTX.teams.createTeam(messageList[0], None)
     elif len(messageList) == 2:
