@@ -4,7 +4,7 @@ import datetime
 import contextlib
 import traceback
 
-from sections import registerSectionHandler, SectionHandler
+import sections
 
 class PuzzleScheduler:
     TriggerEvent = collections.namedtuple("TriggerEvent", ["callTime", "callback", "args", "kwargs"])
@@ -60,12 +60,16 @@ class PuzzleScheduler:
 
 PUZZLE_SCHEDULER = PuzzleScheduler()
 
-def runIn(timeOffset, callback, args=(), kwargs={}):
+def runIn(timeOffset, callback, countdownString = None, args=(), kwargs={}):
     timeAbsolute = datetime.datetime.now() + datetime.timedelta(seconds=timeOffset)
     PUZZLE_SCHEDULER.schedule(timeAbsolute, callback, args, kwargs)
+    if countdownString:
+        displayCountdown(countdownString, timeAbsolute=timeAbsolute)
 
-def runAt(timeAbsolute, callback, args=(), kwargs={}):
+def runAt(timeAbsolute, callback, countdownString = None, args=(), kwargs={}):
     PUZZLE_SCHEDULER.schedule(timeAbsolute, callback, args, kwargs)
+    if countdownString:
+        displayCountdown(countdownString, timeAbsolute=timeAbsolute)
 
 COUNTDOWN_MESSAGE_STRING = None
 COUNTDOWN_MESSAGE_TIME = None
@@ -78,9 +82,12 @@ def displayCountdown(messageString, timeOffset=None, timeAbsolute=None):
     COUNTDOWN_MESSAGE_STRING = messageString.encode()
     COUNTDOWN_MESSAGE_TIME = timeAbsolute.isoformat().encode()
     COUNTDOWN_MESSAGE_VERSION += 1
+    # push countdown to everyone
+    sections.pushSection("countdown", 0)
+    sections.pushSection("countdown", 1)
 
-@registerSectionHandler("countdown")
-class CountdownSectionHandler(SectionHandler):
+@sections.registerSectionHandler("countdown")
+class CountdownSectionHandler(sections.SectionHandler):
     def requestSection(self, requestor, sectionId):
         if sectionId == "0":
             return (COUNTDOWN_MESSAGE_VERSION, 0, COUNTDOWN_MESSAGE_STRING)

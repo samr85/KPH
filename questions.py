@@ -23,6 +23,10 @@ class Question:
         # When the question unlocks.  This should be set to either another question,
         #  or something that is compared against in huntSpecific code
         self.unlockOn = "initial"
+        # HTML template to use to display this question
+        self.HTMLTemplate = "questionDisplay.html"
+        # HTML template to use to display for marking
+        self.HTMLMarkTemplate = "questionMark.html"
 
         ## Do not modify these
         # List of hints - modify using addHint()
@@ -42,11 +46,20 @@ class Question:
         return json.dumps(self.__dict__, indent=4)
 
     def completed(self, team):
-        """ Called when the question is marked correct to unlock dependent questions"""
+        """ Called when the question is marked correct to unlock dependent questions.
+            Overload and call super().complete(team) if you want to do more """
         for question in QuestionList.questionList.values():
             if question.unlockOn == self.__class__:
                 print("unlocking %s for team %s"%(question.name, team.name))
                 CTX.enableQuestion(question, team)
+
+    def submitAnswer(self, answer):
+        """ Overload if you want something special to happen when an answer is submitted """
+        pass
+
+    def submissionCheck(self, answer, answerString, currentTime):
+        """ Overload this if there might be a special reason that answers (or a specific answer) can't be submitted.  Reply with a string to refuse submission """
+        return None
 
 class QuestionList:
     """ A container holding of all questions in the hunt """

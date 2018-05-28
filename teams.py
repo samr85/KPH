@@ -94,6 +94,9 @@ class TeamList:
     def getTeam(self, name, password=None):
         """ Get the team structure from the name.  Check the team's password if one is given """
         with self.lock:
+            # Might have to html escape the name, if this was called manually
+            if html.escape(name) in self.teamList:
+                name = html.escape(name)
             if name in self.teamList:
                 team = self.teamList[name]
                 if password != None and password != team.password:

@@ -14,12 +14,14 @@ class HuntContext:
         import admin
         import questions
         import answers
+        import huntSpecific
         self.questions = questions.QuestionList()
         self.teams = teams.TeamList()
         self.admin = admin.AdminList()
         self.answerQueue = answers.AnswerSubmissionQueue()
         self.newAnswer = answers.Answer
         self.messagingClients = messageHandler.MessagingClients()
+        self.state = huntSpecific.huntState()
 
         # Logging in with no passwords
         self.enableInsecure = False

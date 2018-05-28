@@ -4,6 +4,11 @@ import scheduler
 from controller import CTX
 from commandRegistrar import handleCommand
 
+# This class is for a global state that anything specific to the hunt can access
+class huntState:
+    def __init__(self):
+        self.huntStarted = False
+
 #Called when the server is loading up.  Only function in here that is called automatically.
 # Reloading is set if the server was started with a previous messages file.  Called before any messages are loaded.
 #  Will need to work out exactly what state we should be in, so any timers created here need to be worked out somehow
@@ -36,6 +41,7 @@ def loadTeamList():
 # Use @handleCommand if you want to be able to send any messages to this code from the browsers.
 @handleCommand("startHunt", adminRequired=True)
 def startHunt():
+    CTX.state.huntStarted = True
     print("Hunt is starting!!!")
     for question in CTX.questions.questionList.values():
         if question.unlockOn == "initial":

@@ -1,3 +1,4 @@
+import sys
 import threading
 import os.path
 import argparse
@@ -7,11 +8,15 @@ import html
 import tornado.web
 import tornado.websocket
 
+sys.path.insert(0, "KPH")
+
+# This must be first
+from controller import CTX
+
 from globalItems import ErrorMessage, startTime
 import messageHandler
 import commandRegistrar
 import huntSpecific
-from controller import CTX
 
 class WSHandler(tornado.websocket.WebSocketHandler):
     def __init__(self, *args, **kwargs):

@@ -51,17 +51,21 @@ class Answer:
         sections.pushSection("question", self.question.id, self.team)
         sections.pushSection("answerQueue", self.id)
 
-    def submitAnswer(self, answer, time):
+    def submitAnswer(self, answerString, time):
         if not self.enabled:
             raise ErrorMessage("Cannot submit answer to disabled question")
+        msg = self.question.submissionCheck(self, answerString, time)
+        if msg:
+            raise ErrorMessage(msg)
         if self.status == INCORRECT:
-            self.answer = answer
+            self.answer = answerString
             CTX.answerQueue.queueAnswer(self)
             self.status = SUBMITTED
             if time:
                 self.answeredTime = time
             else:
                 self.answeredTime = datetime.datetime.now()
+            self.question.submitAnswer(self)
             self.update()
         else:
             raise ErrorMessage("Can't submit an answer to an already answered question!")
@@ -85,14 +89,14 @@ class Answer:
     def renderQuestion(self):
         """ Create the HTML to display this to the user """
         version = self.version
-        html = SECTION_LOADER.load("question.html").generate(answer=self)
+        html = SECTION_LOADER.load(self.question.HTMLTemplate).generate(answer=self)
         return (version, self.question.id, html)
 
     def renderAnswerQueue(self):
         """ Create the HTML to display this to an admin """
         if self.awaitingAnswer():
             version = self.version
-            html = SECTION_LOADER.load("answerQueue.html").generate(answer=self)
+            html = SECTION_LOADER.load(self.question.HTMLMarkTemplate).generate(answer=self)
             return (version, self.answeredTime.isoformat(), html)
         print("ERROR: requesting admin answer for one that isn't awaiting an answer")
         return (self.version, 0, None)
