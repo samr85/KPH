@@ -1,3 +1,5 @@
+import base64
+
 from commandRegistrar import handleCommand
 from globalItems import ErrorMessage
 import sections
@@ -11,9 +13,13 @@ class AdminList:
         self.messages = []
         self.password = None
 
-    def messageAdmin(self, message):
+    def messageAdmin(self, message, alert=False):
         self.messages.append(message)
         sections.pushSection("message", len(self.messages) - 1, "admin")
+        if alert:
+            for client in self.messagingClients:
+                client.write_message("alert %s"%(base64.b64encode(message.encode()).decode()))
+
 
     @staticmethod
     def renderAnswerQueue(answerId):
@@ -41,7 +47,7 @@ def markAnswer(_server, messageList, _time):
 @handleCommand("messageAdmin", teamRequired=True)
 def teamMessageAdmin(server, messageList, _time):
     """ Send a message from a team to the admins.  Possibly disable? """
-    CTX.admin.messageAdmin("Team Message: %s: %s"%(server.team.name, " ".join(messageList)))
+    CTX.admin.messageAdmin("Team Message: %s: %s"%(server.team.name, " ".join(messageList)), alert=True)
     server.team.notifyTeam("Message Sent: %s"%(" ".join(messageList)))
 
 @handleCommand("messageTeam", adminRequired=True)
@@ -52,9 +58,9 @@ def adminMessageTeam(_server, messageList, _time):
     if teamName == "all":
         CTX.admin.messageAdmin("Announcement: %s"%(message))
         for team in CTX.teams.teamList.values():
-            team.notifyTeam("Announcement: %s"%(message))
+            team.notifyTeam("Announcement: %s"%(message), alert=True)
     else:
         # raises exception on error
         team = CTX.teams.getTeam(teamName)
-        team.notifyTeam("Admin Message: %s"%(message))
+        team.notifyTeam("Admin Message: %s"%(message), alert=True)
         CTX.admin.messageAdmin("Message Sent: %s: %s"%(teamName, message))

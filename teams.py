@@ -2,6 +2,7 @@ from threading import RLock, Lock
 import datetime
 import collections
 import html
+import base64
 
 import sections
 from globalItems import ErrorMessage, startTime
@@ -19,9 +20,12 @@ class Team:
         # NOTE: very bad practice if teams were allowed to pick passwords
         self.password = password
 
-    def notifyTeam(self, message):
+    def notifyTeam(self, message, alert=False):
         self.messages.append(message)
         sections.pushSection("message", len(self.messages) - 1, self)
+        if alert:
+            for client in self.messagingClients:
+                client.write_message("alert %s"%(base64.b64encode(message.encode()).decode()))
 
     def submitAnswer(self, questionId, answerString, time):
         if questionId not in self.questionAnswers:

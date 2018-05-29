@@ -18,7 +18,7 @@ update section request - requests the above, sent for each section with the wron
 [type, id]
 */
 
-var sectionTypes = new Map()
+var sectionTypes = new Map();
 
 class SectionType {
     constructor(name, updateFunction) {
@@ -34,7 +34,7 @@ class SectionHolder {
         var typeName = msgList.shift();
         this.id = msgList.shift();
         this.version = Number(msgList.shift());
-        if (this.id == NaN || this.version == NaN) {
+        if (isNaN(this.id) || isNaN(this.version)) {
             throw "Invalid msglist - NaN!" + msgList.join(" ");
         }
 
@@ -47,12 +47,12 @@ class SectionHolder {
         }
         /* was this ID know about before? */
         if (this.id in this.thisType.oldIdList) {
-            delete this.thisType.oldIdList[this.id]
+            delete this.thisType.oldIdList[this.id];
         }
     }
 
     checkForUpdates() {
-        if (!(this.id in this.idList) || this.idList[this.id] != this.version) {
+        if (!(this.id in this.idList) || this.idList[this.id] !== this.version) {
             requestUpdateSection(this.thisType.name, this.id);
         }
     }
@@ -88,10 +88,10 @@ function updateSectionListHandler(msg)
     }
 
     sectionTypes.forEach(function (st) {
-        st.oldIdList = st.idList
-        st.idList = {}
-        console.log("Created oldIdList for:")
-        console.log(st)
+        st.oldIdList = st.idList;
+        st.idList = {};
+        console.log("Created oldIdList for:");
+        console.log(st);
     });
     while (msgList.length)
     {
@@ -109,7 +109,7 @@ function updateSectionListHandler(msg)
 
 function requestUpdateSection(typeName, id)
 {
-    sendMessage(["UpdateSectionRequest", typeName, id].join(" "))
+    sendMessage(["UpdateSectionRequest", typeName, id].join(" "));
 }
 
 function updateSectionHandler(msg)
@@ -126,17 +126,17 @@ function updateSectionHandler(msg)
 function sortCallback(a, b) { return $(a).data('sort') > $(b).data('sort'); }
 
 function standardSection(holderName, modifySectionCallback = undefined) {
-    var sectionName = holderName + "Section"
+    var sectionName = holderName + "Section";
     function updateStandardSection(id, sortValue, data) {
         console.log("Calling update for section: " + holderName + " for id: " + id);
-        var oldSection = $("#" + sectionName + id)
+        var oldSection = $("#" + sectionName + id);
         if (data.length === 0) {
             if (oldSection.length !== 0) {
-                oldSection[0].parentElement.removeChild(oldSection[0])
+                oldSection[0].parentElement.removeChild(oldSection[0]);
             }
         }
         else {
-            var section
+            var section;
             if (oldSection.length === 0) {
                 section = document.createElement("div");
                 section.id = sectionName + id;
@@ -166,7 +166,7 @@ function standardSection(holderName, modifySectionCallback = undefined) {
 
 function initialiseSection(sectionName, updateFunction, initialMessages)
 {
-    console.log("Registering for section: " + sectionName)
+    console.log("Registering for section: " + sectionName);
     var section = new SectionType(sectionName, updateFunction);
     sectionTypes.set(sectionName, section);
     initialMessages.forEach(function (message) {

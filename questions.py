@@ -24,9 +24,9 @@ class Question:
         #  or something that is compared against in huntSpecific code
         self.unlockOn = "initial"
         # HTML template to use to display this question
-        self.HTMLTemplate = "questionDisplay.html"
+        self.htmlTemplate = "questionDisplay.html"
         # HTML template to use to display for marking
-        self.HTMLMarkTemplate = "questionMark.html"
+        self.htmlMarkTemplate = "questionMark.html"
 
         ## Do not modify these
         # List of hints - modify using addHint()
@@ -35,11 +35,11 @@ class Question:
         self.id = str(Question._nextId)
         Question._nextId += 1
 
-    def addHint(self, hintHTML, cost=-1):
+    def addHint(self, hintHtml, cost=-1):
         """ Adds a hint to the question"""
         if cost == -1:
             cost = self.defaultHintCost
-        self.hints.append({"hint": hintHTML, "cost": cost})
+        self.hints.append({"hint": hintHtml, "cost": cost})
 
     def toJson(self):
         """ For debugging questions, prints the question details """
@@ -58,8 +58,8 @@ class Question:
         pass
 
     def submissionCheck(self, answer, answerString, currentTime):
-        """ Overload this if there might be a special reason that answers (or a specific answer) can't be submitted.  Reply with a string to refuse submission """
-        return None
+        """ Overload this if there might be a special reason that answers (or a specific answer) can't be submitted.  Return with a string to refuse submission """
+        pass
 
 class QuestionList:
     """ A container holding of all questions in the hunt """
@@ -73,4 +73,5 @@ class QuestionList:
             QuestionList.questionList[newQ.name] = newQ
         return question
 
-registerQuestion = QuestionList.registerQuestion
+def registerQuestion(question):
+    return QuestionList.registerQuestion(question)

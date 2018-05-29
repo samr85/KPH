@@ -1,3 +1,5 @@
+# pylint: disable=wrong-import-position, abstract-method
+# pylint doesn't like modifying the path before importing local modules
 import sys
 import threading
 import os.path
@@ -25,7 +27,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         self.admin = False
         self.validConnection = False
 
-    def open(self):
+    def open(self): # pylint: disable=arguments-differ
         teamName = self.get_secure_cookie("team", None)
         if teamName:
             teamName = teamName.decode()
@@ -78,12 +80,19 @@ class WSHandler(tornado.websocket.WebSocketHandler):
     def sendRefresh(self):
         self.write_message("js: location.reload();")
 
-class TeamRequestHandler(tornado.web.RequestHandler):
+# pylint really doesn't like this class, so this is to make it stop complaining
+class RequestHandler(tornado.web.RequestHandler):
+    def get(self): # pylint: disable=arguments-differ, useless-super-delegation
+        return super().get()
+    def post(self): # pylint: disable=arguments-differ, useless-super-delegation
+        return super().post()
+
+class TeamRequestHandler(RequestHandler):
     def __init__(self, application, request, **kwargs):
         super().__init__(application, request, **kwargs)
         self.team = None
 
-    def get(self, *args, **kwargs):
+    def get(self):
         teamName = self.get_secure_cookie("team")
         if not teamName:
             self.redirect("login")
@@ -95,7 +104,7 @@ class TeamRequestHandler(tornado.web.RequestHandler):
         else:
             self.redirect("login")
             return
-        self.getTeam(*args, **kwargs)
+        self.getTeam()
 
     def getTeam(self):
         raise NotImplementedError("This function should have been overloaded!! " + self.request)
@@ -104,13 +113,13 @@ class TeamPage(TeamRequestHandler):
     def getTeam(self):
         self.render("www\\teampage.html", answers=self.team.questionAnswers.values(), pageTitle="Team %s"%(self.team.name))
 
-class AdminRequestHandler(tornado.web.RequestHandler):
-    def get(self, *args, **kwargs):
+class AdminRequestHandler(RequestHandler):
+    def get(self):
         admin = self.get_secure_cookie("admin", None)
         if not admin:
             self.redirect("login")
             return
-        self.getAdmin(*args, **kwargs)
+        self.getAdmin()
     def getAdmin(self):
         raise NotImplementedError("This function should have been overloaded!! " + self.request)
 
@@ -118,11 +127,11 @@ class AdminPage(AdminRequestHandler):
     def getAdmin(self):
         self.render("www\\admin.html")
 
-class ScorePage(tornado.web.RequestHandler):
+class ScorePage(RequestHandler):
     def get(self):
         self.render("www\\score.html", teamScoreList=CTX.teams.getScoreList(), teamScoreHistory=CTX.teams.getScoreHistory(), startTime=startTime)
 
-class Login(tornado.web.RequestHandler):
+class Login(RequestHandler):
     def get(self):
         self.clear_cookie("team")
         self.clear_cookie("admin")
@@ -132,7 +141,6 @@ class Login(tornado.web.RequestHandler):
         errorMessages = []
         try:
             teamName = self.get_argument("teamSelect", None)
-            teamName = html.escape(teamName)
             password = self.get_argument("teamPassword", None)
             if not password:
                 raise ErrorMessage("Please specify a password")
@@ -145,6 +153,7 @@ class Login(tornado.web.RequestHandler):
                     return
                 raise ErrorMessage("Please specify a team")
 
+            teamName = html.escape(teamName)
             # Excepts an ErrorMessage on error
             CTX.teams.getTeam(teamName, password)
             self.set_secure_cookie("team", teamName)
@@ -155,7 +164,7 @@ class Login(tornado.web.RequestHandler):
             errorMessages.append(ex.message)
         self.render("www\\login.html", Errors=errorMessages, CTX=CTX)
 
-class TestLogin(tornado.web.RequestHandler):
+class TestLogin(RequestHandler):
     def get(self):
         self.clear_cookie("team")
         self.clear_cookie("admin")

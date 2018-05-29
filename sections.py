@@ -44,6 +44,11 @@ class SectionHandler(abc.ABC):
         #return (version, sortValue, content)
         return None
 
+    def requestSectionPush(self, requestor, sectionId):
+        # Overload this if you want to do something different if this is pushed to the client,
+        # rather than being requested from the client
+        return self.requestSection(requestor, sectionId)
+
 SECTION_HANDLERS = {}
 
 def registerSectionHandler(sectionId):
@@ -74,13 +79,13 @@ def pushSection(sectionName, sectionId, requestorSubset=None):
     requestors = sectionReqHandler.getRequestors(requestorSubset)
     if not requestors:
         return
-    (version, sortValue, html) = sectionReqHandler.requestSection(requestors[0], str(sectionId))
-    if not html:
-        html = b''
+    (version, sortValue, sectionHtml) = sectionReqHandler.requestSectionPush(requestors[0], str(sectionId))
+    if not sectionHtml:
+        sectionHtml = b''
     for requestor in requestors:
         try:
             requestor.write_message("updateSection %s %s %s %s %s"%(sectionName, str(sectionId), version, sortValue,
-                                                                    base64.b64encode(html).decode()))
+                                                                    base64.b64encode(sectionHtml).decode()))
         except tornado.websocket.WebSocketClosedError:
             print("Cannot send push for %s, socket closed"%(sectionName))
 
@@ -108,11 +113,11 @@ def updateSectionRequest(requestor, messageList, _unusedTime):
         sectionReq = messageList[0]
         sectionId = messageList[1]
         sectionReqHandler = getCheckSectionHandler(sectionReq, requestor)
-        (version, sortValue, html) = sectionReqHandler.requestSection(requestor, sectionId)
-        if not html:
-            html = b''
+        (version, sortValue, sectionHtml) = sectionReqHandler.requestSection(requestor, sectionId)
+        if not sectionHtml:
+            sectionHtml = b''
         requestor.write_message("updateSection %s %s %s %s %s"%(sectionReq, sectionId, version, sortValue,
-                                                                base64.b64encode(html).decode()))
+                                                                base64.b64encode(sectionHtml).decode()))
     except InvalidRequest as ex:
         requestor.write_message("Error: " + str(ex))
 

@@ -1,3 +1,5 @@
+# pylint: disable=invalid-name
+# Class names are used as the question names, so need to be correct
 from questions import Question, registerQuestion
 
 @registerQuestion

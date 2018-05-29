@@ -1,8 +1,8 @@
-'use strict'
-var countdownTarget /* Time that we should be counting down to */
-var countdownTimeOffset /* Time difference between this browser and the server */
-var countdownString /* Message to display with the countdown */
-var countdownInterval /* Reference to the interval which countdownTick is called on */
+'use strict';
+var countdownTarget; /* Time that we should be counting down to */
+var countdownTimeOffset; /* Time difference between this browser and the server */
+var countdownString; /* Message to display with the countdown */
+var countdownInterval; /* Reference to the interval which countdownTick is called on */
 
 /* Create a numbers array, which is a HTML element containing the ascii art for each number, or colon */
 var numFull = String.raw`/¯¯\  /|  /¯¯\ /¯¯\  /|  |¯¯¯ /¯¯\ |¯¯| /¯¯\ /¯¯\      ` +
@@ -12,7 +12,7 @@ var numFull = String.raw`/¯¯\  /|  /¯¯\ /¯¯\  /|  |¯¯¯ /¯¯\ |¯¯| /¯¯\ /¯¯\      
 var numbers = [];
 var i;
 for (i = 0; i < 11; i++) {
-    var nextNum = "<pre class='largenumber'>"
+    var nextNum = "<pre class='largenumber'>";
     var j;
     for (j = 0; j < 4; j++) {
         var index = (i + j * 11) * 5;
@@ -37,24 +37,24 @@ function countdownTick() {
     msec -= mm * 1000 * 60;
     var ss = Math.floor(msec / 1000);
     msec -= ss * 1000;
-    countdownDiv.empty()
-    countdownDiv.append(numbers[Math.floor((hh / 10) % 10)].clone())
-    countdownDiv.append(numbers[hh % 10].clone())
-    countdownDiv.append(numbers[10].clone())
-    countdownDiv.append(numbers[Math.floor((mm / 10) % 10)].clone())
-    countdownDiv.append(numbers[mm % 10].clone())
-    countdownDiv.append(numbers[10].clone())
-    countdownDiv.append(numbers[Math.floor((ss / 10) % 10)].clone())
-    countdownDiv.append(numbers[ss % 10].clone())
+    countdownDiv.empty();
+    countdownDiv.append(numbers[Math.floor((hh / 10) % 10)].clone());
+    countdownDiv.append(numbers[hh % 10].clone());
+    countdownDiv.append(numbers[10].clone());
+    countdownDiv.append(numbers[Math.floor((mm / 10) % 10)].clone());
+    countdownDiv.append(numbers[mm % 10].clone());
+    countdownDiv.append(numbers[10].clone());
+    countdownDiv.append(numbers[Math.floor((ss / 10) % 10)].clone());
+    countdownDiv.append(numbers[ss % 10].clone());
 }
 
 
 /* This section is unique, id of 0 is the string to display, id of 1 is the time we need to count down to.
   The sortValue of id 1 is the current time on the server, which we can diff to stay in sync even if our clocks are bad */
 function updateCountdown(id, sortValue, data) {
-    if (id == 0) {
+    if (id === 0) {
         countdownString = data;
-    } else if (id == 1) {
+    } else if (id === 1) {
         countdownTarget = Date.parse(data);
         countdownTimeOffset = Date.parse(sortValue) - Date.now();
     } else {

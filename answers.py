@@ -74,7 +74,7 @@ class Answer:
         # Admins should still be able to mark questions once they've been disabled if the user submitted an answer before the question was disabled
         if mark:
             self.status = CORRECT
-            self.team.notifyTeam("%s answer: CORRECT!"%(self.question.name))
+            self.team.notifyTeam("%s answer: CORRECT!"%(self.question.name), alert=True)
             if score == 0:
                 self.score = self.question.score
             else:
@@ -82,21 +82,21 @@ class Answer:
             self.question.completed(self.team)
         else:
             self.status = INCORRECT
-            self.team.notifyTeam("%s answer: INCORRECT :("%(self.question.name))
+            self.team.notifyTeam("%s answer: INCORRECT :("%(self.question.name), alert=True)
             self.previousAnswers.append(self.answer)
         self.update()
 
     def renderQuestion(self):
         """ Create the HTML to display this to the user """
         version = self.version
-        html = SECTION_LOADER.load(self.question.HTMLTemplate).generate(answer=self)
+        html = SECTION_LOADER.load(self.question.htmlTemplate).generate(answer=self)
         return (version, self.question.id, html)
 
     def renderAnswerQueue(self):
         """ Create the HTML to display this to an admin """
         if self.awaitingAnswer():
             version = self.version
-            html = SECTION_LOADER.load(self.question.HTMLMarkTemplate).generate(answer=self)
+            html = SECTION_LOADER.load(self.question.htmlMarkTemplate).generate(answer=self)
             return (version, self.answeredTime.isoformat(), html)
         print("ERROR: requesting admin answer for one that isn't awaiting an answer")
         return (self.version, 0, None)

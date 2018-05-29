@@ -23,7 +23,7 @@ class PuzzleScheduler:
             if runNow:
                 try:
                     runNow.callback(*runNow.args, **runNow.kwargs)
-                except Exception as ex:
+                except Exception as ex: # pylint: disable=broad-except
                     print("Exception in timer callback: " + str(ex))
                     traceback.print_exc()
                 runNow = None
@@ -43,7 +43,7 @@ class PuzzleScheduler:
                 #print("Sleeping for %d"%(timediff.total_seconds()))
                 self._waitsModified.wait(timediff.total_seconds())
 
-    def schedule(self, timeAbsolute, callback, args=(), kwargs={}):
+    def schedule(self, timeAbsolute, callback, args, kwargs):
         if self._reloading:
             return
         event = self.TriggerEvent(timeAbsolute, callback, args, kwargs)
@@ -60,13 +60,13 @@ class PuzzleScheduler:
 
 PUZZLE_SCHEDULER = PuzzleScheduler()
 
-def runIn(timeOffset, callback, countdownString = None, args=(), kwargs={}):
+def runIn(timeOffset, callback, countdownString=None, args=(), kwargs={}): # pylint: disable=dangerous-default-value
     timeAbsolute = datetime.datetime.now() + datetime.timedelta(seconds=timeOffset)
     PUZZLE_SCHEDULER.schedule(timeAbsolute, callback, args, kwargs)
     if countdownString:
         displayCountdown(countdownString, timeAbsolute=timeAbsolute)
 
-def runAt(timeAbsolute, callback, countdownString = None, args=(), kwargs={}):
+def runAt(timeAbsolute, callback, countdownString=None, args=(), kwargs={}): # pylint: disable=dangerous-default-value
     PUZZLE_SCHEDULER.schedule(timeAbsolute, callback, args, kwargs)
     if countdownString:
         displayCountdown(countdownString, timeAbsolute=timeAbsolute)

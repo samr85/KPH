@@ -5,9 +5,10 @@ from controller import CTX
 from commandRegistrar import handleCommand
 
 # This class is for a global state that anything specific to the hunt can access
-class huntState:
+class HuntState:
     def __init__(self):
         self.huntStarted = False
+        self.lastRoundChange = {}
 
 #Called when the server is loading up.  Only function in here that is called automatically.
 # Reloading is set if the server was started with a previous messages file.  Called before any messages are loaded.
