@@ -61,6 +61,14 @@ class Question:
         """ Overload this if there might be a special reason that answers (or a specific answer) can't be submitted.  Return with a string to refuse submission """
         pass
 
+    def markNotification(self, answer):
+        """ Overload this to change what messages (if any!) are sent to the user when the questions is marked """
+        if answer.correct():
+            answer.team.notifyTeam("%s answer: CORRECT!"%(self.name), alert=True)
+        else:
+            answer.team.notifyTeam("%s answer: INCORRECT :("%(self.name), alert=True)
+
+
 class QuestionList:
     """ A container holding of all questions in the hunt """
     questionList = collections.OrderedDict()

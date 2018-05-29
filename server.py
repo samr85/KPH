@@ -6,6 +6,7 @@ import os.path
 import argparse
 import datetime
 import html
+import base64
 
 import tornado.web
 import tornado.websocket
@@ -60,7 +61,9 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         try:
             messageHandler.handleMessage(self, message)
         except ErrorMessage as ex:
-            self.write_message("Error: %s"%(ex.message))
+            errMsg = "Error: %s"%(ex.message)
+            self.write_message(errMsg)
+            self.write_message("alert %s"%(base64.b64encode(errMsg.encode()).decode()))
 
     def on_close(self):
         CTX.messagingClients.removeClient(self)

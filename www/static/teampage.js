@@ -11,9 +11,19 @@ function submitAnswer(question)
     }
 }
 
-function requestHint(question)
+function requestHint(question, value)
 {
-    sendMessage("reqHint " + question);
+    $("<div title='Requesting hint'>Requesting this hint will reduce the value of this question by " + value + "points, are you sure you want to do this ?</div > ").dialog({
+        buttons: {
+            "Confirm": function () {
+                $(this).dialog("close");
+                sendMessage("reqHint " + question);
+            },
+            "Cancel": function () {
+                $(this).dialog("close");
+            }
+        }
+    });
 }
 
 function messageAdmin() {

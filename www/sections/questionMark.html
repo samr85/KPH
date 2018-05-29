@@ -24,7 +24,6 @@
         <input type="hidden" id="teamName{{answer.id}}" value="{{answer.team.name}}" />
         <input type="hidden" id="questionName{{answer.id}}" value="{{answer.question.id}}" />
         <input type="hidden" id="correct{{answer.id}}" value="{{correct}}" />
-        <input type="checkbox" id="override{{answer.id}}" />Override expected answer<br />
         {%if answer.question.score==0%}
         <input type="number" id="score{{answer.id}}" />Score for question<br />
         Note: {{answer.getCurrentHintCost()}} points will be taken off this score for hints<br />

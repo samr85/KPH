@@ -74,7 +74,6 @@ class Answer:
         # Admins should still be able to mark questions once they've been disabled if the user submitted an answer before the question was disabled
         if mark:
             self.status = CORRECT
-            self.team.notifyTeam("%s answer: CORRECT!"%(self.question.name), alert=True)
             if score == 0:
                 self.score = self.question.score
             else:
@@ -82,8 +81,8 @@ class Answer:
             self.question.completed(self.team)
         else:
             self.status = INCORRECT
-            self.team.notifyTeam("%s answer: INCORRECT :("%(self.question.name), alert=True)
             self.previousAnswers.append(self.answer)
+        self.question.markNotification(self)
         self.update()
 
     def renderQuestion(self):

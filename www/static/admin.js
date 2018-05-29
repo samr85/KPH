@@ -1,30 +1,39 @@
+"use strict";
 
 function mark(id, mark) {
-    teamName = $("#teamName" + id)[0];
-    questionName = $("#questionName" + id)[0];
-    correct = $("#correct" + id)[0];
-    override = $("#override" + id)[0];
-    score = $("#score" + id)[0];
-    if (!(teamName && questionName && correct && override)) {
+    var teamName = $("#teamName" + id)[0];
+    var questionName = $("#questionName" + id)[0];
+    var correct = $("#correct" + id)[0];
+    var score = $("#score" + id)[0];
+    if (!(teamName && questionName && correct)) {
         errorHandler("an element doesn't exist for marking id:" + id);
         return;
     }
 
-    if (mark !== correct.value && !override.checked) {
-        errorHandler("Attempting to mark question unexpectedly without ticking to override");
-        return;
-    }
-
+    var markString = "markAnswer " + teamName.value + " " + questionName.value + " " + mark;
     if (score !== undefined){
         if (!score.value) {
             errorHandler("question has custom scoring, but no score specified");
             return;
         }
-        sendMessage("markAnswer " + teamName.value + " " + questionName.value + " " + mark + " " + score.value);
+        markString += " " + score.value;
     }
-    else {
-        sendMessage("markAnswer " + teamName.value + " " + questionName.value + " " + mark);
+
+    if (mark !== correct.value) {
+        $("<div title='Unexpected marking choice'>You've selected an unexpected response for this mark, are you sure?</div>").dialog({
+            buttons: {
+                "Confirm": function () {
+                    $(this).dialog("close");
+                    sendMessage(markString);
+                },
+                "Cancel": function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+        return;
     }
+    sendMessage(markString);
 }
 
 function messageTeam() {

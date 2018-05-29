@@ -17,7 +17,7 @@
         {%end%}
         {%if answer.canRequestHint()%}
         <div class="hintRequest">
-            <button onclick="requestHint('{{question.id}}');">Request Hint</button> (cost: {{question.hints[answer.hintCount]["cost"]}} points)
+            <button onclick="requestHint('{{question.id}}', {{question.hints[answer.hintCount]["cost"]}});">Request Hint</button> (cost: {{question.hints[answer.hintCount]["cost"]}} points)
         </div>
         {%end%}
     </div>

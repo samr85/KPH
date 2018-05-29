@@ -36,14 +36,11 @@ class Command:
         if self.logMessage:
             self.log(server, messageList, time)
 
-        try:
-            if self.teamRequired and server.team:
-                with server.team.lock:
-                    self.function(server, messageList, time)
-            else:
+        if self.teamRequired and server.team:
+            with server.team.lock:
                 self.function(server, messageList, time)
-        except ErrorMessage as ex:
-            server.write_message("Error: %s"%(ex.message))
+        else:
+            self.function(server, messageList, time)
 
     def log(self, server, messageList, time):
         sObject = OrderedDict((("time", time.isoformat()),

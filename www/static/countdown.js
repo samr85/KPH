@@ -27,34 +27,50 @@ for (i = 0; i < 11; i++) {
 
 function countdownTick() {
     var countdownDiv = $("#countdownTime");
+    if (isNaN(countdownTarget)) {
+        console.log("No valid countdown timer");
+        countdownDiv.empty();
+        return;
+    }
     var msec = countdownTarget - Date.now() - countdownTimeOffset;
     if (msec < 0) {
         msec = 0;
     }
     var hh = Math.floor(msec / 1000 / 60 / 60);
+    if (hh > 99){
+        console.log("Error: countdown time longer than 99 hours! %d", hh);
+        msec = 0;
+        hh = 0;
+    }
     msec -= hh * 1000 * 60 * 60;
     var mm = Math.floor(msec / 1000 / 60);
     msec -= mm * 1000 * 60;
     var ss = Math.floor(msec / 1000);
     msec -= ss * 1000;
     countdownDiv.empty();
-    countdownDiv.append(numbers[Math.floor((hh / 10) % 10)].clone());
-    countdownDiv.append(numbers[hh % 10].clone());
-    countdownDiv.append(numbers[10].clone());
-    countdownDiv.append(numbers[Math.floor((mm / 10) % 10)].clone());
-    countdownDiv.append(numbers[mm % 10].clone());
-    countdownDiv.append(numbers[10].clone());
-    countdownDiv.append(numbers[Math.floor((ss / 10) % 10)].clone());
-    countdownDiv.append(numbers[ss % 10].clone());
+    try {
+        countdownDiv.append(numbers[Math.floor((hh / 10) % 10)].clone());
+        countdownDiv.append(numbers[hh % 10].clone());
+        countdownDiv.append(numbers[10].clone());
+        countdownDiv.append(numbers[Math.floor((mm / 10) % 10)].clone());
+        countdownDiv.append(numbers[mm % 10].clone());
+        countdownDiv.append(numbers[10].clone());
+        countdownDiv.append(numbers[Math.floor((ss / 10) % 10)].clone());
+        countdownDiv.append(numbers[ss % 10].clone());
+    }
+    catch (error) {
+        console.log("Failed to make divs... hh: %d mm: %d ss: %s", hh, mm, ss);
+        console.error(error);
+    }
 }
 
 
 /* This section is unique, id of 0 is the string to display, id of 1 is the time we need to count down to.
   The sortValue of id 1 is the current time on the server, which we can diff to stay in sync even if our clocks are bad */
 function updateCountdown(id, sortValue, data) {
-    if (id === 0) {
+    if (id === "0") {
         countdownString = data;
-    } else if (id === 1) {
+    } else if (id === "1") {
         countdownTarget = Date.parse(data);
         countdownTimeOffset = Date.parse(sortValue) - Date.now();
     } else {
