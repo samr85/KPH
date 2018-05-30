@@ -224,6 +224,7 @@ def startServer():
     serverThread.start()
 
 def initilise():
+    os.makedirs("messages", exist_ok=True)
     parser = argparse.ArgumentParser(description="Runs KPH webserver")
     parser.add_argument("--reloadMessages", "-r", type=argparse.FileType("r"), help="Reload the messages from specified file")
     # Open mode of x means fail if the file already exists
