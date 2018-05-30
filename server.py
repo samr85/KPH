@@ -7,6 +7,7 @@ import argparse
 import datetime
 import html
 import base64
+import asyncio
 
 import tornado.web
 import tornado.websocket
@@ -212,9 +213,12 @@ class TestLogin(RequestHandler):
             errorMessages.append(ex.message)
         self.render("www\\testLogin.html", getTeamQuickLogin=self.getTeamQuickLogin, Errors=errorMessages)
 
+def initialiseTornado():
+    asyncio.set_event_loop(asyncio.new_event_loop())
+    tornado.ioloop.IOLoop.instance().start()
 
 def startServer():
-    serverThread = threading.Thread(target=tornado.ioloop.IOLoop.instance().start)
+    serverThread = threading.Thread(target=initialiseTornado)
     # Exit the server thread when the main thread terminates
     serverThread.daemon = True
     serverThread.start()
