@@ -60,6 +60,9 @@ class SectionHolder {
     update(sortValue, contents) {
         this.thisType.update(this.id, sortValue, contents);
         this.idList[this.id] = this.version;
+        if (window.postSectionUpdate !== undefined) {
+            window.postSectionUpdate();
+        }
     }
 }
 
@@ -127,12 +130,15 @@ function sortCallback(a, b) { return $(a).data('sort') > $(b).data('sort'); }
 
 function standardSection(holderName, modifySectionCallback = undefined) {
     var sectionName = holderName + "Section";
+    // These 2 vars can't be filled in until we finish loading the page
+    var emptyDiv = undefined;
+    var holder = undefined;
     function updateStandardSection(id, sortValue, data) {
         console.log("Calling update for section: " + holderName + " for id: " + id);
         var oldSection = $("#" + sectionName + id);
         if (data.length === 0) {
             if (oldSection.length !== 0) {
-                oldSection[0].parentElement.removeChild(oldSection[0]);
+                holder.removeChild(oldSection[0]);
             }
         }
         else {
@@ -140,12 +146,7 @@ function standardSection(holderName, modifySectionCallback = undefined) {
             if (oldSection.length === 0) {
                 section = document.createElement("div");
                 section.id = sectionName + id;
-                var holder = $("#" + holderName);
-                if (holder.length === 0)
-                {
-                    throw "holder " + holderName + " does not exist!";
-                }
-                holder.append(section);
+                holder.appendChild(section)
             }
             else {
                 section = oldSection[0];
@@ -158,8 +159,26 @@ function standardSection(holderName, modifySectionCallback = undefined) {
             }
         }
         // SORT
-        $('.' + sectionName).sort(sortCallback).appendTo('#' + holderName);
+        var children = $('.' + sectionName);
+        if (children.length == 0) {
+            holder.appendChild(emptyDiv) ;
+        } else {
+            holder.removeChild(emptyDiv);
+            children.sort(sortCallback).appendTo('#' + holderName);
+        }
     }
+    // At end of page load, look at the contents of the parent div, wrap that in a div, and save it off as
+    //  the html that should be displayed whenever there is nothing else there
+    $(function () {
+        var holderJQ = $("#" + holderName);
+        if (holderJQ.length !== 1) {
+            throw "holder " + holderName + " does not exist!";
+        }
+        holder = holderJQ[0];
+        emptyDiv = $("<dev>" + holder.innerHTML + "<div>")[0];
+        holder.innerHTML = "";
+        holder.appendChild(emptyDiv);
+    });
     return updateStandardSection;
 }
 
