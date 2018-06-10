@@ -1,4 +1,12 @@
 {% autoescape None %}
+
+{# to disable either of these, create a predefinitions block setting them to false #}
+{% set enableMessageBox = True %}
+{% set enableCountdown = True %}
+{% set enableLogout = True %}
+
+{% block predefinitions %}{% end %}
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,14 +18,23 @@
     <script src="static/jquery-ui-1.12.1/jquery-ui.min.js"></script>
     <script src="static/sections.js"></script>
     <script src="static/messaging.js"></script>
-    <script src="static/countdown.js"></script>
     <link rel="stylesheet" type="text/css" href="static/messaging.css" />
-    {% block extraheaders %}{%end%}
+    {% block extraheaders %}{% end %}
 </head>
 <body>
-    <div id="messageList"></div>
-    <div id="countdownDiv"></div>
-    <a href="\login">Logout</a><br />
+    {% if enableMessageBox %}
+      <script src="static/messageBox.js"></script>
+      <div id="messageList"></div>
+    {% else %}
+      <script src="static/messageBoxDisabled.js"></script>
+    {% end %}
+    {% if enableCountdown %}
+      <script src="static/countdown.js" defer></script>
+      <div id="countdownDiv"></div>
+    {% end %}
+    {% if enableLogout %}
+      <a href="\login">Logout</a><br />
+    {% end %}
 
     {% block contents %}
     {% end %}

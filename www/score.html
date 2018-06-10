@@ -1,5 +1,10 @@
-﻿{% extends "basepage.html" %}
+{% extends "basepage.html" %}
 {% autoescape None %}
+
+{%block predefinitions%}
+{% set enableMessageBox = False %}
+{% set enableLogout = False %}
+{%end%}
 
 {%block extraheaders%}
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>

@@ -1,6 +1,12 @@
 {% extends "basepage.html" %}
 {% autoescape None %}
 
+{%block predefinitions%}
+{% set enableMessageBox = False %}
+{% set enableCountdown = False %}
+{% set enableLogout = False %}
+{%end%}
+
 {%block title%}Login{%end%}
 
 {%block contents %}
