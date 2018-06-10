@@ -1,0 +1,14 @@
+{% extends "basepage.html" %}
+{% autoescape None %}
+
+{%block title%}Admin Team Viewer: {{team.name}}{%end%}
+{%block extraheaders%}
+<script src="static/admin.js"></script>
+<link rel="stylesheet" type="text/css" href="static/admin.css" />
+<link type="text/css" rel="stylesheet" href="static/team.css" />
+<script>initialiseSection("adminTeamViewer:{{team.name}}", standardSection("adminTeamViewer"), []);</script>
+{%end%}
+
+{%block contents %}
+<div id="adminTeamViewer"></div>
+{%end%}

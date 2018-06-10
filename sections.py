@@ -67,6 +67,9 @@ def getSectionHandler(sectionName):
     return SECTION_HANDLERS[sectionName]
 
 def getCheckSectionHandler(sectionName, requestor):
+    if ":" in sectionName:
+        (sectionName, sectionInformation) = sectionName.split(":", 1)
+        requestor.sectionAdditionalInformation[sectionName] = sectionInformation
     sectionReqHandler = getSectionHandler(sectionName)
     if sectionReqHandler.requireTeam and not requestor.team:
         raise InvalidRequest("Team required")
@@ -84,7 +87,11 @@ def pushSection(sectionName, sectionId, requestorSubset=None):
         sectionHtml = b''
     for requestor in requestors:
         try:
-            requestor.write_message("updateSection %s %s %s %s %s"%(sectionName, str(sectionId), version, sortValue,
+            if sectionName in requestor.sectionAdditionalInformation:
+                thisSectionName = sectionName + ":" + requestor.sectionAdditionalInformation[sectionName]
+            else:
+                thisSectionName = sectionName
+            requestor.write_message("updateSection %s %s %s %s %s"%(thisSectionName, str(sectionId), version, sortValue,
                                                                     base64.b64encode(sectionHtml).decode()))
         except tornado.websocket.WebSocketClosedError:
             print("Cannot send push for %s, socket closed"%(sectionName))
@@ -134,22 +141,7 @@ class QuestionSectionHandler(SectionHandler):
         return (version, sortValue, html)
 
     def requestUpdateList(self, requestor):
-        versionList = []
-        for answer in requestor.team.questionAnswers.values():
-            versionList.append((answer.question.id, answer.version))
-        return versionList
-
-@registerSectionHandler("answerQueue")
-class AdminAnswersHandler(SectionHandler):
-    def __init__(self):
-        super().__init__()
-        self.requireAdmin = True
-
-    def requestSection(self, requestor, sectionId):
-        return requestor.admin.renderAnswerQueue(sectionId)
-
-    def requestUpdateList(self, requestor):
-        return requestor.admin.getAnswerQueueEntries()
+        return requestor.team.listQuestionIdVersions()
 
 @registerSectionHandler("message")
 class TeamMessageLogHandler(SectionHandler):

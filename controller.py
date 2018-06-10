@@ -32,7 +32,7 @@ class HuntContext:
             messageDict = json.loads(line)
             if "team" in messageDict:
                 try:
-                    team = self.teams.getTeam(messageDict["team"])
+                    team = CTX.teams[messageDict["team"]]
                 except ErrorMessage:
                     team = None
                     print("Invalid team in message file: %s" % (messageDict["team"]))
@@ -45,19 +45,24 @@ class HuntContext:
     def enableQuestion(self, question, team=None):
         """ Makes the question available to specified team (or all) """
         if not team:
-            for teamIt in self.teams.teamList.values():
+            for teamIt in self.teams:
                 self.enableQuestion(question, teamIt)
             return
 
-        if question.id not in team.questionAnswers:
-            team.questionAnswers[question.id] = self.newAnswer(question, team)
-        team.questionAnswers[question.id].enabled = True
-        sections.pushSection("question", question.id, team)
+        with team.lock:
+            if question.id not in team.questionAnswers:
+                thisAnswer = self.newAnswer(question, team)
+                team.questionAnswers[question.id] = thisAnswer
+                question.teamAnswers.append(thisAnswer)
+            else:
+                thisAnswer = team.questionAnswers[question.id]
+            thisAnswer.enabled = True
+            thisAnswer.update();
 
     def disableQuestion(self, question, team=None):
         """ Specific (or all) team can no submit answers to this question """
         if not team:
-            for teamIt in self.teams.teamList.values():
+            for teamIt in self.teams:
                 self.disableQuestion(question, teamIt)
             return
         if question.id not in team.questionAnswers:

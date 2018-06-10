@@ -1,4 +1,5 @@
 import datetime
+import tornado
 
 class ErrorMessage(Exception):
     def __init__(self, message):
@@ -6,3 +7,4 @@ class ErrorMessage(Exception):
         self.message = message
 
 startTime = datetime.datetime.now()
+SECTION_LOADER = tornado.template.Loader("www/sections")

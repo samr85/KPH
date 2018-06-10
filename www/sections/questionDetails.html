@@ -1,0 +1,26 @@
+{% autoescape None %}
+
+<div class="question">
+    <div class="questionName">Question: {{question.name}}</div>
+    {% if question.question %}
+        <div class="questionDescription">{{question.question}}</div>
+    {% end %}
+    All hints:<br />
+    {% for hint in question.hints %}
+        <div class="hintText">{{hint["hint"]}}</div>
+    {% end %}
+    Correct answers: {{", ".join(question.answers)}}<br />
+    {% set answered = [answer for answer in question.teamAnswers if answer.correct()] %}
+    {% set notAnswered = [answer for answer in question.teamAnswers if not answer.correct()] %}
+    Teams answered correctly: {{ len(answered) }}<br />
+    {% if len(question.hints) > 0 %}
+        {% for hintNo in range(len(question.hints) + 1) %}
+            Teams answered with {{hintNo}} hints: {{ len([a for a in answered if a.hintCount == hintNo]) }}<br />
+        {% end %}
+        {% for hintNo in range(len(question.hints) + 1) %}
+            Teams not answered with {{hintNo}} hints: {{ len([a for a in notAnswered if a.hintCount == hintNo]) }}<br />
+        {% end %}
+    {% end %}
+    All incorrect answers:<br />
+    {{ ", ".join([strAns for ans in question.teamAnswers for strAns in ans.previousAnswers]) }}<br />
+</div>

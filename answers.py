@@ -1,14 +1,12 @@
 from threading import Lock
 import datetime
 import collections
-import tornado
 
-from globalItems import ErrorMessage
+from globalItems import ErrorMessage, SECTION_LOADER
 import sections
 
 from controller import CTX
 
-SECTION_LOADER = tornado.template.Loader("www/sections")
 INCORRECT = 0
 SUBMITTED = 1
 CORRECT = 2
@@ -49,6 +47,8 @@ class Answer:
         # Team structure holding this should already be locked
         self.version += 1
         sections.pushSection("question", self.question.id, self.team)
+        sections.pushSection("adminTeamViewer", self.question.id, self.team)
+        sections.pushSection("adminQuestionViewer", self.question.id)
         sections.pushSection("answerQueue", self.id)
 
     def submitAnswer(self, answerString, time):
@@ -85,10 +85,10 @@ class Answer:
         self.question.markNotification(self)
         self.update()
 
-    def renderQuestion(self):
+    def renderQuestion(self, admin=False):
         """ Create the HTML to display this to the user """
         version = self.version
-        html = SECTION_LOADER.load(self.question.htmlTemplate).generate(answer=self)
+        html = SECTION_LOADER.load(self.question.htmlTemplate).generate(answer=self, admin=admin)
         return (version, self.question.id, html)
 
     def renderAnswerQueue(self):

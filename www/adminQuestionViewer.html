@@ -1,0 +1,14 @@
+{% extends "basepage.html" %}
+{% autoescape None %}
+
+{%block title%}Admin Question Viewer{%end%}
+{%block extraheaders%}
+<script src="static/admin.js"></script>
+<link rel="stylesheet" type="text/css" href="static/admin.css" />
+<link type="text/css" rel="stylesheet" href="static/team.css" />
+<script>initialiseSection("adminQuestionViewer", standardSection("adminQuestionViewer"), []);</script>
+{%end%}
+
+{%block contents %}
+<div id="adminQuestionViewer"></div>
+{%end%}

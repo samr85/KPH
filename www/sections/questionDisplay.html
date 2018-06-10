@@ -15,7 +15,7 @@
         {%for hint in question.hints[:answer.hintCount]%}
         <div class="hintText">{{hint["hint"]}}</div>
         {%end%}
-        {%if answer.canRequestHint()%}
+        {%if answer.canRequestHint() and not admin%}
         <div class="hintRequest">
             <button onclick="requestHint('{{question.id}}', {{question.hints[answer.hintCount]["cost"]}});">Request Hint</button> (cost: {{question.hints[answer.hintCount]["cost"]}} points)
         </div>
@@ -31,12 +31,31 @@
     <div class="submittedAnswer">
         Submitted answer awaiting marking: {{answer.answer}}
     </div>
-    {%elif answer.canSubmitAnswer()%}
+    {%elif answer.canSubmitAnswer() and not admin%}
     <div class="answerRequest">
         <form action="javascript:void(0)">
             <input id="{{question.id}}Answer" type="text" name="" />
             <button onclick="submitAnswer('{{question.id}}')">Submit answer</button>
         </form>
     </div>
+    {%end%}
+    {%if admin%}
+        <form action="javascript:void(0)">
+            <button onclick="changeHintLevel('{{question.id}}')">Change hint level</button>
+            <input id="{{question.id}}HintLevel" type="number" value="{{answer.hintCount}}" />
+        </form>
+        {%if answer.correct()%}
+            <form action="javascript:void(0)">
+                <button onclick="changeScore('{{question.id}}')">Change score</button>
+                <input id="{{question.id}}Score" type="number" value="{{answer.score}}" />[hints remove: {{answer.score - answer.getScore()}} points]
+            </form>
+            <form action="javascript:void(0)">
+                <button onclick="markIncorrect('{{question.id}}')">Mark question as incorrect</button>
+            </form>
+        {%else%}
+            <form action="javascript:void(0)">
+                <button onclick="markCorrect('{{question.id}}')">Mark question as correct</button>
+            </form>
+        {%end%}
     {%end%}
 </div>

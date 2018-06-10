@@ -44,21 +44,21 @@ def loadTeamList():
 def startHunt():
     CTX.state.huntStarted = True
     print("Hunt is starting!!!")
-    for question in CTX.questions.questionList.values():
+    for question in CTX.questions:
         if question.unlockOn == "initial":
             CTX.enableQuestion(question)
-    CTX.disableQuestion(question, CTX.teams.getTeam(html.escape("<b>b'b")))
+    CTX.disableQuestion(question, CTX.teams[html.escape("<b>b'b")])
     #scheduler.runIn(6, finalPuzzleCallback)
     scheduler.runIn(1000, endHuntCallback)
     scheduler.displayCountdown("Time remaining", 1000)
 
 def endHuntCallback():
     print("Hunt has finished!")
-    for question in CTX.questions.questionList.values():
+    for question in CTX.questions:
         CTX.disableQuestion(question)
 
 def finalPuzzleCallback():
-    for question in CTX.questions.questionList.values():
+    for question in CTX.questions:
         if question.unlockOn != "finalQuestion":
             CTX.disableQuestion(question)
         else:

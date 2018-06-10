@@ -28,15 +28,16 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         self.team = None
         self.admin = False
         self.validConnection = False
+        self.sectionAdditionalInformation = {}
 
     def open(self): # pylint: disable=arguments-differ
         teamName = self.get_secure_cookie("team", None)
         if teamName:
             teamName = teamName.decode()
             destString = "team " + teamName
-            if teamName in CTX.teams.teamList:
-                self.team = CTX.teams.teamList[teamName]
-            else:
+            try:
+                self.team = CTX.teams[teamName]
+            except ErrorMessage:
                 print('ERROR: Connection opened from non-existent team: %s!'%(teamName))
                 self.write_message("Error: team %s doesn't exist!!"%(teamName))
                 self.sendRefresh()
@@ -103,9 +104,9 @@ class TeamRequestHandler(RequestHandler):
             return
         teamName = teamName.decode()
         print("Request for team page for: %s"%(teamName))
-        if teamName in CTX.teams.teamList:
-            self.team = CTX.teams.teamList[teamName]
-        else:
+        try:
+            self.team = CTX.teams[teamName]
+        except ErrorMessage:
             self.redirect("login")
             return
         self.getTeam()
@@ -129,8 +130,17 @@ class AdminRequestHandler(RequestHandler):
 
 class AdminPage(AdminRequestHandler):
     def getAdmin(self):
-        self.render("www\\admin.html")
+        self.render("www\\admin.html", CTX=CTX)
 
+class AdminTeamViewerPage(AdminRequestHandler):
+    def getAdmin(self):
+        teamName = self.get_argument("teamSelect", None)
+        team = CTX.teams[teamName]
+        self.render("www\\adminTeamViewer.html", team=team)
+class AdminQuestionViewerPage(AdminRequestHandler):
+    def getAdmin(self):
+        self.render("www\\adminQuestionViewer.html")
+        
 class ScorePage(RequestHandler):
     def get(self):
         self.render("www\\score.html", teamScoreList=CTX.teams.getScoreList(), teamScoreHistory=CTX.teams.getScoreHistory(), startTime=startTime)
@@ -177,8 +187,8 @@ class TestLogin(RequestHandler):
     @staticmethod
     def getTeamQuickLogin():
         retHTML = ""
-        for team in CTX.teams.teamList:
-            retHTML += "<input name='QuickLogin' type='Submit' value='%s' /><br />"%(team)
+        for team in CTX.teams:
+            retHTML += "<input name='QuickLogin' type='Submit' value='%s' /><br />"%(team.name)
         return retHTML
 
     def post(self):
@@ -186,7 +196,7 @@ class TestLogin(RequestHandler):
         try:
             if self.get_argument("QuickLogin", None):
                 teamName = html.escape(self.get_argument("QuickLogin"))
-                if teamName in CTX.teams.teamList:
+                if teamName in CTX.teams:
                     self.set_secure_cookie("team", teamName)
                     self.redirect("\\teampage")
                     return
@@ -200,7 +210,7 @@ class TestLogin(RequestHandler):
                 return
             elif self.get_argument("login", None):
                 teamName = html.escape(self.get_argument("teamName"))
-                if teamName in CTX.teams.teamList:
+                if teamName in CTX.teams:
                     self.set_secure_cookie("team", teamName)
                     self.redirect("\\teampage")
                     return
@@ -255,6 +265,8 @@ def initilise():
         (r"/login", Login),
         (r"/teampage", TeamPage),
         (r"/admin", AdminPage),
+        (r"/adminTeamViewer", AdminTeamViewerPage),
+        (r"/adminQuestionViewer", AdminQuestionViewerPage),
         (r"/score", ScorePage)
         ]
     if CTX.enableInsecure:

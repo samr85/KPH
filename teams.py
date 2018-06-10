@@ -64,10 +64,16 @@ class Team:
         answerHistory.append((datetime.datetime.now(), curScore, datetimeToJsString(datetime.datetime.now())))
         return answerHistory
 
-    def renderQuestion(self, questionId):
+    def renderQuestion(self, questionId, admin=False):
         if questionId in self.questionAnswers:
-            return self.questionAnswers[questionId].renderQuestion()
+            return self.questionAnswers[questionId].renderQuestion(admin)
         raise ErrorMessage("Invalid question: %s"%(questionId))
+
+    def listQuestionIdVersions(self):
+        versionList = []
+        for answer in self.questionAnswers.values():
+            versionList.append((answer.question.id, answer.version))
+        return versionList
 
 def datetimeToJsString(dtime):
     return str(tuple([i for i in dtime.timetuple()][:6]))
@@ -81,6 +87,14 @@ class TeamList:
     def __init__(self):
         self.lock = Lock()
         self.teamList = {}
+
+    # Make this class act as a dictionay of teams, so can just do for team in CTX.teams or CTX.teams[teamName]
+    def __iter__(self):
+        return self.teamList.values().__iter__()
+    def __len__(self):
+        return self.teamList.__len__()
+    def __getitem__(self, key):
+        return self.getTeam(key)
 
     def createTeam(self, name, password):
         """ Make a new team """
@@ -110,7 +124,7 @@ class TeamList:
                 raise ErrorMessage("Team %s doesn't exist!"%(name))
 
     def getScoreList(self):
-        scores = [TeamScore(team) for team in self.teamList.values()]
+        scores = [TeamScore(team) for team in self]
         dtnow = datetime.datetime.now()
         #TODO: Sorting is wrong!!!
         return sorted(scores, key=lambda teamS: (teamS.score, dtnow - teamS.time), reverse=True)
@@ -134,6 +148,6 @@ def setTeamPenalty(_server, messageList, _time):
     teamName = messageList[0]
     scorePenalty = int(messageList[1])
     reason = messageList[2]
-    team = CTX.teams.getTeam(teamName)
+    team = CTX.teams[teamName]
     team.penalty = scorePenalty
     team.notifyTeam("You have been given a penalty of %d points for %s"%(scorePenalty, reason))

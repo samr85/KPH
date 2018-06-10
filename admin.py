@@ -1,7 +1,7 @@
 import base64
 
 from commandRegistrar import handleCommand
-from globalItems import ErrorMessage
+from globalItems import ErrorMessage, SECTION_LOADER
 import sections
 
 from controller import CTX
@@ -57,10 +57,69 @@ def adminMessageTeam(_server, messageList, _time):
     message = " ".join(messageList[1:])
     if teamName == "all":
         CTX.admin.messageAdmin("Announcement: %s"%(message))
-        for team in CTX.teams.teamList.values():
+        for team in CTX.teams:
             team.notifyTeam("Announcement: %s"%(message), alert=True)
     else:
         # raises exception on error
-        team = CTX.teams.getTeam(teamName)
+        team = CTX.teams[teamName]
         team.notifyTeam("Admin Message: %s"%(message), alert=True)
         CTX.admin.messageAdmin("Message Sent: %s: %s"%(teamName, message))
+
+@sections.registerSectionHandler("answerQueue")
+class AdminAnswersHandler(sections.SectionHandler):
+    def __init__(self):
+        super().__init__()
+        self.requireAdmin = True
+
+    def requestSection(self, requestor, sectionId):
+        return requestor.admin.renderAnswerQueue(sectionId)
+
+    def requestUpdateList(self, requestor):
+        return requestor.admin.getAnswerQueueEntries()
+
+@sections.registerSectionHandler("adminTeamViewer")
+class AdminTeamViewer(sections.SectionHandler):
+    def __init__(self):
+        super().__init__()
+        self.requireAdmin = True
+        self.name = "adminTeamViewer"
+
+    def requestSection(self, requestor, sectionId):
+        if self.name not in requestor.sectionAdditionalInformation:
+            raise ErrorMessage("You've not requested what team to view")
+        teamName = requestor.sectionAdditionalInformation[self.name]
+        team = CTX.teams[teamName]
+        return team.renderQuestion(sectionId, admin=True)
+
+    def requestUpdateList(self, requestor):
+        if self.name not in requestor.sectionAdditionalInformation:
+            raise ErrorMessage("You've not requested what team to view")
+        teamName = requestor.sectionAdditionalInformation[self.name]
+        team = CTX.teams[teamName]
+        return team.listQuestionIdVersions()
+
+    def getRequestors(self, team):
+        return [r for r in self.requestors if r.sectionAdditionalInformation[self.name] == team.name]
+
+@sections.registerSectionHandler("adminQuestionViewer")
+class AdminQuestionViewer(sections.SectionHandler):
+    def __init__(self):
+        super().__init__()
+        self.requireAdmin = True
+
+    @staticmethod
+    def calcVersion(question):
+        return sum(answer.version for answer in question.teamAnswers)
+
+    def requestSection(self, requestor, sectionId):
+        """ Create the HTML to display this to the user """
+        question = CTX.questions[sectionId]
+        version = self.calcVersion(question)
+        html = SECTION_LOADER.load("questionDetails.html").generate(question=question, CTX=CTX)
+        return (version, sectionId, html)
+
+    def requestUpdateList(self, requestor):
+        versionList = []
+        for question in CTX.questions:
+            versionList.append((question.id, self.calcVersion(question)))
+        return versionList

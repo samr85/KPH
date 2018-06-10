@@ -146,7 +146,7 @@ function standardSection(holderName, modifySectionCallback = undefined) {
             if (oldSection.length === 0) {
                 section = document.createElement("div");
                 section.id = sectionName + id;
-                holder.appendChild(section)
+                holder.appendChild(section);
             }
             else {
                 section = oldSection[0];
@@ -160,10 +160,12 @@ function standardSection(holderName, modifySectionCallback = undefined) {
         }
         // SORT
         var children = $('.' + sectionName);
-        if (children.length == 0) {
-            holder.appendChild(emptyDiv) ;
+        if (children.length === 0) {
+            holder.appendChild(emptyDiv);
         } else {
-            holder.removeChild(emptyDiv);
+            if (emptyDiv.parentNode === holder) {
+                holder.removeChild(emptyDiv);
+            }
             children.sort(sortCallback).appendTo('#' + holderName);
         }
     }

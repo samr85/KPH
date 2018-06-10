@@ -29,6 +29,8 @@ class Question:
         self.htmlMarkTemplate = "questionMark.html"
 
         ## Do not modify these
+        # A list of the team Answer structures refering to this question
+        self.teamAnswers = []
         # List of hints - modify using addHint()
         self.hints = []
         # Id for the question, used for communicating with clients
@@ -78,8 +80,16 @@ class QuestionList:
     def registerQuestion(question):
         newQ = question()
         with QuestionList.lock:
-            QuestionList.questionList[newQ.name] = newQ
+            QuestionList.questionList[newQ.id] = newQ
         return question
+
+    # Make this class act as if it was a dict of questionList
+    def __iter__(self):
+        return self.questionList.values().__iter__()
+    def __len__(self):
+        return self.questionList.__len__()
+    def __getitem__(self, key):
+        return self.questionList.__getitem__(key)
 
 def registerQuestion(question):
     return QuestionList.registerQuestion(question)

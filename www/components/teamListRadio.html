@@ -1,5 +1,5 @@
 {% autoescape None %}
 
-{%for teamName in CTX.teams.teamList%}
-<input type="radio" name="teamSelect" value="{{teamName}}" id="{{teamName}}Radio"/><label for="{{teamName}}Radio">{{teamName}}</label><br />
+{%for team in CTX.teams%}
+<input type="radio" name="teamSelect" value="{{team.name}}" id="{{team.name}}Radio"/><label for="{{team.name}}Radio">{{team.name}}</label><br />
 {%end%}

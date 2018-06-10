@@ -49,5 +49,3 @@ function messageTeam() {
     }
     sendMessage("messageTeam " + teamName + " " + message);
 }
-
-initialiseSection("answerQueue", standardSection("answerQueue"), []);
