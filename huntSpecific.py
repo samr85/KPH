@@ -33,11 +33,13 @@ def initialise(reloading=False):
 
 # Dummy examples of roughly what we might want this file to look like
 def loadQuestionList():
-    import dummyQuestionList
+    import KPHQuestions
 
 def loadTeamList():
-    CTX.teams.createTeam("aa", "a")
-    CTX.teams.createTeam("<b>b'b", "b")
+    CTX.teams.createTeam("j", "j")
+    CTX.teams.createTeam("c", "c")
+    CTX.teams.createTeam("t", "t")
+    CTX.teams.createTeam("a", "a")
 
 # Use @handleCommand if you want to be able to send any messages to this code from the browsers.
 @handleCommand("startHunt", adminRequired=True)
@@ -47,19 +49,21 @@ def startHunt():
     for question in CTX.questions:
         if question.unlockOn == "initial":
             CTX.enableQuestion(question)
-    CTX.disableQuestion(question, CTX.teams[html.escape("<b>b'b")])
+    #CTX.disableQuestion(question, CTX.teams[html.escape("<b>b'b")])
     #scheduler.runIn(6, finalPuzzleCallback)
-    scheduler.runIn(1000, endHuntCallback)
-    scheduler.displayCountdown("Time remaining", 1000)
+    scheduler.runIn(180, endHuntCallback)
+    scheduler.runIn(60, metaCallback)
+    scheduler.displayCountdown("Time remaining", 180)
 
 def endHuntCallback():
     print("Hunt has finished!")
     for question in CTX.questions:
         CTX.disableQuestion(question)
-
-def finalPuzzleCallback():
+            
+def metaCallback():
     for question in CTX.questions:
-        if question.unlockOn != "finalQuestion":
-            CTX.disableQuestion(question)
-        else:
+        if question.unlockOn == "MetaUnlock":
+            # TODO: WD should we worry about if teams have already unlocked this? 
+            # TODO: WD should probably send a notification so it's not too surprising for teams. 
             CTX.enableQuestion(question)
+
