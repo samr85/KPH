@@ -57,7 +57,7 @@ class HuntContext:
             else:
                 thisAnswer = team.questionAnswers[question.id]
             thisAnswer.enabled = True
-            thisAnswer.update();
+            thisAnswer.update()
 
     def disableQuestion(self, question, team=None):
         """ Specific (or all) team can no submit answers to this question """

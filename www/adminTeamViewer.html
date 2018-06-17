@@ -6,9 +6,11 @@
 <script src="static/admin.js"></script>
 <link rel="stylesheet" type="text/css" href="static/admin.css" />
 <link type="text/css" rel="stylesheet" href="static/team.css" />
-<script>initialiseSection("adminTeamViewer:{{team.name}}", standardSection("adminTeamViewer"), []);</script>
+<script>initialiseSection("adminQuestion:{{team.name}}", standardSection("adminQuestion"), []);</script>
+<script>initialiseSection("adminPenalty:{{team.name}}", standardSection("adminPenalty"), []);</script>
 {%end%}
 
 {%block contents %}
-<div id="adminTeamViewer"></div>
+<div id="adminPenalty"></div>
+<div id="adminQuestion"></div>
 {%end%}

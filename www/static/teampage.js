@@ -36,3 +36,4 @@ function messageAdmin() {
 }
 
 initialiseSection("question", standardSection("questionList"), []);
+initialiseSection("penalty", standardSection("penaltyDiv"), []);

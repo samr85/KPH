@@ -5,7 +5,7 @@ import html
 import base64
 
 import sections
-from globalItems import ErrorMessage, startTime
+from globalItems import ErrorMessage, startTime, SECTION_LOADER
 from commandRegistrar import handleCommand
 from controller import CTX
 
@@ -17,6 +17,8 @@ class Team:
         self.lock = RLock()
         self.messagingClients = []
         self.penalty = 0
+        self.penaltyReason = ""
+        self.penaltyId = 0
         # NOTE: very bad practice if teams were allowed to pick passwords
         self.password = password
 
@@ -150,4 +152,40 @@ def setTeamPenalty(_server, messageList, _time):
     reason = messageList[2]
     team = CTX.teams[teamName]
     team.penalty = scorePenalty
-    team.notifyTeam("You have been given a penalty of %d points for %s"%(scorePenalty, reason))
+    team.penaltyReason = reason
+    team.penaltyId += 1
+    team.notifyTeam("You have been given a penalty of %d points for reason: %s"%(scorePenalty, reason), alert=True)
+    sections.pushSection("penalty", 0, team)
+    sections.pushSection("adminPenalty", 0, team)
+
+@sections.registerSectionHandler("penalty")
+class PenaltySectionHandler(sections.SectionHandler):
+    def __init__(self):
+        super().__init__()
+        self.requireTeam = True
+
+    def requestSection(self, requestor, sectionId):
+        if sectionId == "0" and requestor.team.penalty > 0:
+            return (requestor.team.penaltyId, 0, SECTION_LOADER.load("penaltyDisplay.html").generate(team=requestor.team, admin=False))
+        return (0, 0, None)
+
+    def requestUpdateList(self, requestor):
+        if requestor.team.penalty > 0:
+            return [(0, requestor.team.penaltyId)]
+        return []
+
+@sections.registerSectionHandler("adminPenalty")
+class AdminPenaltySectionHandler(sections.SegragatedSectionHandler):
+    def __init__(self):
+        super().__init__()
+        self.requireAdmin = True
+
+    def requestSectionSegment(self, requestor, sectionId, segment):
+        team = CTX.teams.getTeam(segment)
+        if sectionId == "0":
+            return (team.penaltyId, 0, SECTION_LOADER.load("penaltyDisplay.html").generate(team=team, admin=True))
+        return (0, 0, None)
+
+    def requestUpdateListSegment(self, requestor, segment):
+        team = CTX.teams.getTeam(segment)
+        return [(0, team.penaltyId)]

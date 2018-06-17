@@ -3,6 +3,7 @@ import abc
 import tornado
 
 from commandRegistrar import handleCommand
+from globalItems import ErrorMessage
 
 # Sections are the way for list of items on the page to be always kept in sync with what they should show automatically.
 
@@ -12,6 +13,7 @@ class SectionHandler(abc.ABC):
         self.requireTeam = False
         self.requireAdmin = False
         self.requestors = []
+        self.name = None
 
     def registerForUpdates(self, requestor):
         """Request future updates for this type of message"""
@@ -37,24 +39,51 @@ class SectionHandler(abc.ABC):
     def requestUpdateList(self, requestor):
         # This function is called by the browser when it wants to know if there is any additional information to look up.
         #return [(id, version), ...]
-        return []
+        raise NotImplementedError()
 
     @abc.abstractmethod
     def requestSection(self, requestor, sectionId):
         #return (version, sortValue, content)
-        return None
+        raise NotImplementedError()
 
     def requestSectionPush(self, requestor, sectionId):
         # Overload this if you want to do something different if this is pushed to the client,
         # rather than being requested from the client
         return self.requestSection(requestor, sectionId)
 
+class SegragatedSectionHandler(SectionHandler):
+    def requestSection(self, requestor, sectionId):
+        if self.name not in requestor.sectionAdditionalInformation:
+            raise ErrorMessage("You've not requested what team to view")
+        return self.requestSectionSegment(requestor, sectionId, requestor.sectionAdditionalInformation[self.name])
+
+    @abc.abstractmethod
+    def requestSectionSegment(self, requestor, sectionId, segment):
+        #return (version, sortValue, content)
+        raise NotImplementedError()
+
+    def requestUpdateList(self, requestor):
+        if self.name not in requestor.sectionAdditionalInformation:
+            raise ErrorMessage("You've not requested what team to view")
+        return self.requestUpdateListSegment(requestor, requestor.sectionAdditionalInformation[self.name])
+
+    @abc.abstractmethod
+    def requestUpdateListSegment(self, requestor, segment):
+        # This function is called by the browser when it wants to know if there is any additional information to look up.
+        #return [(id, version), ...]
+        raise NotImplementedError()
+
+    def getRequestors(self, requestorSubset):
+        return [r for r in self.requestors if r.sectionAdditionalInformation[self.name] == requestorSubset]
+
 SECTION_HANDLERS = {}
 
 def registerSectionHandler(sectionId):
     """Register this class as a handler for the named section"""
     def registerSectionHandlerInt(handlerClass):
-        SECTION_HANDLERS[sectionId] = handlerClass()
+        handlerInst = handlerClass()
+        handlerInst.name = sectionId
+        SECTION_HANDLERS[sectionId] = handlerInst
         return handlerClass
     return registerSectionHandlerInt
 
@@ -127,21 +156,6 @@ def updateSectionRequest(requestor, messageList, _unusedTime):
                                                                 base64.b64encode(sectionHtml).decode()))
     except InvalidRequest as ex:
         requestor.write_message("Error: " + str(ex))
-
-@registerSectionHandler("question")
-class QuestionSectionHandler(SectionHandler):
-    def __init__(self):
-        super().__init__()
-        self.requireTeam = True
-
-    def requestSection(self, requestor, sectionId):
-        (version, sortValue, html) = requestor.team.renderQuestion(sectionId)
-        if version == 0:
-            raise InvalidRequest("Question name %s not available to team"%(sectionId))
-        return (version, sortValue, html)
-
-    def requestUpdateList(self, requestor):
-        return requestor.team.listQuestionIdVersions()
 
 @registerSectionHandler("message")
 class TeamMessageLogHandler(SectionHandler):

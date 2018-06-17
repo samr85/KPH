@@ -3,6 +3,8 @@ import json
 import collections
 
 from controller import CTX
+import sections
+from globalItems import SECTION_LOADER
 
 class Question:
     """ Class holding the questions for the hunt.
@@ -93,3 +95,57 @@ class QuestionList:
 
 def registerQuestion(question):
     return QuestionList.registerQuestion(question)
+
+@sections.registerSectionHandler("question")
+class QuestionSectionHandler(sections.SectionHandler):
+    def __init__(self):
+        super().__init__()
+        self.requireTeam = True
+
+    def requestSection(self, requestor, sectionId):
+        (version, sortValue, html) = requestor.team.renderQuestion(sectionId)
+        if version == 0:
+            raise sections.InvalidRequest("Question name %s not available to team"%(sectionId))
+        return (version, sortValue, html)
+
+    def requestUpdateList(self, requestor):
+        return requestor.team.listQuestionIdVersions()
+
+@sections.registerSectionHandler("adminQuestion")
+class AdminQuestionSectionHandler(sections.SegragatedSectionHandler):
+    """ Shows an editable version of a team's question entries to the admins """
+    def __init__(self):
+        super().__init__()
+        self.requireAdmin = True
+
+    def requestSectionSegment(self, requestor, sectionId, segment):
+        team = CTX.teams[segment]
+        return team.renderQuestion(sectionId, admin=True)
+
+    def requestUpdateListSegment(self, requestor, segment):
+        team = CTX.teams[segment]
+        return team.listQuestionIdVersions()
+
+@sections.registerSectionHandler("adminQuestionViewer")
+class AdminQuestionViewer(sections.SectionHandler):
+    """ Lists all of the questions to the admins """
+    def __init__(self):
+        super().__init__()
+        self.requireAdmin = True
+
+    @staticmethod
+    def calcVersion(question):
+        return sum(answer.version for answer in question.teamAnswers)
+
+    def requestSection(self, requestor, sectionId):
+        """ Create the HTML to display this to the user """
+        question = CTX.questions[sectionId]
+        version = self.calcVersion(question)
+        html = SECTION_LOADER.load("questionDetails.html").generate(question=question, CTX=CTX)
+        return (version, sectionId, html)
+
+    def requestUpdateList(self, requestor):
+        versionList = []
+        for question in CTX.questions:
+            versionList.append((question.id, self.calcVersion(question)))
+        return versionList

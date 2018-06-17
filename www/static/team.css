@@ -3,8 +3,9 @@
 }
 .questionName {
     font-weight: bold;
+    color: blue;
 }
-.questionListSection, .adminTeamViewerSection {
+.questionListSection, .adminQuestionListSectionn {
     margin-top: 25px;
 }
 
