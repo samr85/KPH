@@ -47,7 +47,7 @@ class Answer:
         # Team structure holding this should already be locked
         self.version += 1
         sections.pushSection("question", self.question.id, self.team)
-        sections.pushSection("adminTeamViewer", self.question.id, self.team)
+        sections.pushSection("adminQuestion", self.question.id, self.team.name)
         sections.pushSection("adminQuestionViewer", self.question.id)
         sections.pushSection("answerQueue", self.id)
 

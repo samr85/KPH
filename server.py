@@ -2,7 +2,7 @@
 # pylint doesn't like modifying the path before importing local modules
 import sys
 import threading
-import os.path
+import os
 import argparse
 import datetime
 import html
@@ -140,7 +140,7 @@ class AdminTeamViewerPage(AdminRequestHandler):
 class AdminQuestionViewerPage(AdminRequestHandler):
     def getAdmin(self):
         self.render("www\\adminQuestionViewer.html")
-        
+
 class ScorePage(RequestHandler):
     def get(self):
         self.render("www\\score.html", teamScoreList=CTX.teams.getScoreList(), teamScoreHistory=CTX.teams.getScoreHistory(), startTime=startTime)

@@ -49,3 +49,9 @@ function messageTeam() {
     }
     sendMessage("messageTeam " + teamName + " " + message);
 }
+
+function adjustAnswer(adjustmentType, qId, teamName, newValue)
+{
+    console.log(adjustmentType + " " + qId + " " + teamName + " " + newValue)
+    sendMessage("adjustAnswer " + adjustmentType + " " + qId + " " + teamName + " " + newValue)
+}

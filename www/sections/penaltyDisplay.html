@@ -1,0 +1,11 @@
+{% autoescape None %}
+
+Penalty: {{team.penalty}}<br />
+Reason: {{team.penaltyReason}}
+{% if admin %}
+    <form action="javascript:void(0)">
+        <button onclick="sendMessage('setTeamPenalty {{team.name}} ' + $('#penaltyValue')[0].value + ' ' + $('#penaltyReason')[0].value)">change team penalty level</button>
+        <input id="penaltyValue" type="number" value="{{team.penalty}}" />
+        <input id="penaltyReason" type="text" value="{{team.penaltyReason}}" />
+    </form>
+{% end %}

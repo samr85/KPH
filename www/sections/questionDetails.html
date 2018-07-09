@@ -5,22 +5,30 @@
     {% if question.question %}
         <div class="questionDescription">{{question.question}}</div>
     {% end %}
-    All hints:<br />
-    {% for hint in question.hints %}
-        <div class="hintText">{{hint["hint"]}}</div>
+    {% if len(question.hints) > 0 %}
+        All hints:<br />
+        {% for hint in question.hints %}
+            <div class="hintText">{{hint["hint"]}}</div>
+        {% end %}
     {% end %}
-    Correct answers: {{", ".join(question.answers)}}<br />
+    {% if len(question.answers) > 0 %}
+        Correct answers: {{", ".join(question.answers)}}<br />
+    {% end %}
     {% set answered = [answer for answer in question.teamAnswers if answer.correct()] %}
     {% set notAnswered = [answer for answer in question.teamAnswers if not answer.correct()] %}
-    Teams answered correctly: {{ len(answered) }}<br />
-    {% if len(question.hints) > 0 %}
-        {% for hintNo in range(len(question.hints) + 1) %}
-            Teams answered with {{hintNo}} hints: {{ len([a for a in answered if a.hintCount == hintNo]) }}<br />
+    <table>
+        <tr><th></th><th>Correct</th><th>Incorrect</th></tr>
+        <tr><td>Total</td><td>{{len(answered)}}</td><td>{{len(notAnswered)}}</td></tr>
+        {% if len(question.hints) > 0 %}
+            {% for hintNo in range(len(question.hints) + 1) %}
+                <tr><td>{{hintNo}} Hints</td><td>{{ len([a for a in answered if a.hintCount == hintNo]) }}</td><td>{{ len([a for a in notAnswered if a.hintCount == hintNo]) }}</td></tr>
+            {% end %}
         {% end %}
-        {% for hintNo in range(len(question.hints) + 1) %}
-            Teams not answered with {{hintNo}} hints: {{ len([a for a in notAnswered if a.hintCount == hintNo]) }}<br />
-        {% end %}
+    </table>
+    
+    {% set incorrectAnswers=[strAns for ans in question.teamAnswers for strAns in ans.previousAnswers] %}
+    {% if len(incorrectAnswers) > 0 %}
+        All incorrect answers:<br />
+        {{ ", ".join(incorrectAnswers) }}<br />
     {% end %}
-    All incorrect answers:<br />
-    {{ ", ".join([strAns for ans in question.teamAnswers for strAns in ans.previousAnswers]) }}<br />
 </div>

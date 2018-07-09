@@ -41,20 +41,20 @@
     {%end%}
     {%if admin%}
         <form action="javascript:void(0)">
-            <button onclick="changeHintLevel('{{question.id}}')">Change hint level</button>
+            <button onclick="adjustAnswer('hintLevel', '{{question.id}}', '{{answer.team.name}}', $('#{{question.id}}HintLevel')[0].value)">Change hint level</button>
             <input id="{{question.id}}HintLevel" type="number" value="{{answer.hintCount}}" />
         </form>
         {%if answer.correct()%}
             <form action="javascript:void(0)">
-                <button onclick="changeScore('{{question.id}}')">Change score</button>
+                <button onclick="adjustAnswer('score', '{{question.id}}', '{{answer.team.name}}', $('#{{question.id}}Score')[0].value)">Change score</button>
                 <input id="{{question.id}}Score" type="number" value="{{answer.score}}" />[hints remove: {{answer.score - answer.getScore()}} points]
             </form>
             <form action="javascript:void(0)">
-                <button onclick="markIncorrect('{{question.id}}')">Mark question as incorrect</button>
+                <button onclick="adjustAnswer('mark', '{{question.id}}', '{{answer.team.name}}', false)">Mark question as incorrect</button>
             </form>
         {%else%}
             <form action="javascript:void(0)">
-                <button onclick="markCorrect('{{question.id}}')">Mark question as correct</button>
+                <button onclick="adjustAnswer('mark', '{{question.id}}', '{{answer.team.name}}', true)">Mark question as correct</button>
             </form>
         {%end%}
     {%end%}

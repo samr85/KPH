@@ -1,7 +1,7 @@
 import base64
 
 from commandRegistrar import handleCommand
-from globalItems import ErrorMessage, SECTION_LOADER
+from globalItems import ErrorMessage
 import sections
 
 from controller import CTX
@@ -65,6 +65,46 @@ def adminMessageTeam(_server, messageList, _time):
         team.notifyTeam("Admin Message: %s"%(message), alert=True)
         CTX.admin.messageAdmin("Message Sent: %s: %s"%(teamName, message))
 
+@handleCommand("adjustAnswer", messageListLen=4, adminRequired=True)
+def adjustAnswer(_server, messageList, _time):
+    """ Modify the answer referring to a team's submission """
+    adjustType = messageList[0]
+    questionId = messageList[1]
+    teamName = messageList[2]
+    newValue = messageList[3]
+    team = CTX.teams.getTeam(teamName)
+    try:
+        answer = team.questionAnswers[questionId]
+    except KeyError:
+        raise ErrorMessage("Invalid questionId: %s"%(questionId))
+    if adjustType == "hintLevel":
+        try:
+            newValue = int(newValue)
+        except ValueError:
+            raise ErrorMessage("Invalid hint level: %s"%(newValue))
+        if newValue > len(answer.question.hints):
+            raise ErrorMessage("Hint level too high: %d/%d"%(newValue, len(answer.question.hints)))
+        answer.hintCount = newValue
+        answer.update()
+    elif adjustType == 'score':
+        try:
+            newValue = int(newValue)
+        except ValueError:
+            raise ErrorMessage("Invalid score: %s"%(newValue))
+        answer.score = newValue
+        answer.update()
+    elif adjustType == 'mark':
+        if newValue == "true":
+            mark = True
+        elif newValue == "false":
+            mark = False
+        else:
+            raise ErrorMessage("Invalid true/false: %s"%(newValue))
+        answer.mark(mark, 0)
+    else:
+        raise ErrorMessage("Unknown command: %s"%(adjustType))
+
+
 @sections.registerSectionHandler("answerQueue")
 class AdminAnswersHandler(sections.SectionHandler):
     def __init__(self):
@@ -76,50 +116,3 @@ class AdminAnswersHandler(sections.SectionHandler):
 
     def requestUpdateList(self, requestor):
         return requestor.admin.getAnswerQueueEntries()
-
-@sections.registerSectionHandler("adminTeamViewer")
-class AdminTeamViewer(sections.SectionHandler):
-    def __init__(self):
-        super().__init__()
-        self.requireAdmin = True
-        self.name = "adminTeamViewer"
-
-    def requestSection(self, requestor, sectionId):
-        if self.name not in requestor.sectionAdditionalInformation:
-            raise ErrorMessage("You've not requested what team to view")
-        teamName = requestor.sectionAdditionalInformation[self.name]
-        team = CTX.teams[teamName]
-        return team.renderQuestion(sectionId, admin=True)
-
-    def requestUpdateList(self, requestor):
-        if self.name not in requestor.sectionAdditionalInformation:
-            raise ErrorMessage("You've not requested what team to view")
-        teamName = requestor.sectionAdditionalInformation[self.name]
-        team = CTX.teams[teamName]
-        return team.listQuestionIdVersions()
-
-    def getRequestors(self, team):
-        return [r for r in self.requestors if r.sectionAdditionalInformation[self.name] == team.name]
-
-@sections.registerSectionHandler("adminQuestionViewer")
-class AdminQuestionViewer(sections.SectionHandler):
-    def __init__(self):
-        super().__init__()
-        self.requireAdmin = True
-
-    @staticmethod
-    def calcVersion(question):
-        return sum(answer.version for answer in question.teamAnswers)
-
-    def requestSection(self, requestor, sectionId):
-        """ Create the HTML to display this to the user """
-        question = CTX.questions[sectionId]
-        version = self.calcVersion(question)
-        html = SECTION_LOADER.load("questionDetails.html").generate(question=question, CTX=CTX)
-        return (version, sectionId, html)
-
-    def requestUpdateList(self, requestor):
-        versionList = []
-        for question in CTX.questions:
-            versionList.append((question.id, self.calcVersion(question)))
-        return versionList
