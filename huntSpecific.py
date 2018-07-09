@@ -61,9 +61,9 @@ def endHuntCallback():
         CTX.disableQuestion(question)
             
 def metaCallback():
-    for question in CTX.questions:
-        if question.unlockOn == "MetaUnlock":
-            # TODO: WD should we worry about if teams have already unlocked this? 
-            # TODO: WD should probably send a notification so it's not too surprising for teams. 
-            CTX.enableQuestion(question)
+
+    for team in CTX.teams:
+        if CTX.state.metaQuestion.id not in team.questionAnswers:
+            team.notifyTeam("Meta puzzle unlocked automatically!", alert=True)
+    CTX.enableQuestion(CTX.state.metaQuestion)
 
