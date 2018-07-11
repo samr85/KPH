@@ -184,7 +184,6 @@ function standardSection(holderName, modifySectionCallback = undefined) {
     return updateStandardSection;
 }
 
-
 function initialiseSection(sectionName, updateFunction, initialMessages)
 {
     console.log("Registering for section: " + sectionName);
@@ -194,4 +193,42 @@ function initialiseSection(sectionName, updateFunction, initialMessages)
         section.update(message["contents"]);
         section.idList[message["id"]] = message["version"];
     });
+}
+
+var sectionDisplays = new Map();
+function chechSectionToggle(identifier, speed = 0)
+{
+    if (sectionDisplays.has(identifier))
+    {
+        $("." + identifier + "triangle").removeClass("ui-icon-triangle-1-s").addClass("ui-icon-triangle-1-e")
+        $("." + identifier).slideUp(speed)
+    }
+    else
+    {
+        $("." + identifier + "triangle").removeClass("ui-icon-triangle-1-e").addClass("ui-icon-triangle-1-s")
+        $("." + identifier).slideDown(speed)
+    }
+}
+function toggleSection(identifier)
+{
+    if (sectionDisplays.has(identifier))
+    {
+        sectionDisplays.delete(identifier);
+    }
+    else
+    {
+        sectionDisplays.set(identifier, true);
+    }
+    chechSectionToggle(identifier, 200);
+}
+
+function standardSectionCheckToggle(holderName, modifySectionCallback = undefined) {
+    var mainFn = standardSection(holderName, modifySectionCallback);
+    function updateStandardSectionCheckToggle(id, sortValue, data){
+        mainFn(id, sortValue, data);
+        for (const identifier of sectionDisplays.keys()){
+            chechSectionToggle(identifier);
+        }
+    }
+    return updateStandardSectionCheckToggle;
 }

@@ -1,13 +1,13 @@
 {%autoescape None%}
 {%set question = answer.question%}
 
-<div class="question{%if not answer.enabled%} questionDisabled{%end%}">
+<div class="question{%if not answer.enabled%} questionDisabled{%end%} {{" ".join(question.htmlClasses)}}">
     <div class="questionName">Question: {{question.name}}</div>
     {%if question.question%}
     <div class="questionDescription">{{question.question}}</div>
     {%end%}
 </div>
-<div class="answer">
+<div class="answer {{" ".join(question.htmlClasses)}}">
     {%if answer.correct()%}
     <div class="answerCorrect">Correct answer submitted: {{answer.answer}}</div>
     {%end%}

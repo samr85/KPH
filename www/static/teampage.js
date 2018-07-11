@@ -35,5 +35,5 @@ function messageAdmin() {
     sendMessage("messageAdmin " + message);
 }
 
-initialiseSection("question", standardSection("questionList"), []);
+initialiseSection("question", standardSectionCheckToggle("questionList"), []);
 initialiseSection("penalty", standardSection("penaltyDiv"), []);

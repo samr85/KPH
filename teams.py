@@ -75,6 +75,7 @@ class Team:
         versionList = []
         for answer in self.questionAnswers.values():
             versionList.append((answer.question.id, answer.version))
+        versionList.sort(key=lambda x:x[0])
         return versionList
 
 def datetimeToJsString(dtime):

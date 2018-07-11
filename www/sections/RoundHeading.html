@@ -1,0 +1,7 @@
+{%autoescape None%}
+{%set question = answer.question%}
+
+<div class="collapsableHeader {{" ".join(question.htmlClasses)}}" id="{{question.__class__.__name__}}" onclick='toggleSection("{{question.__class__.__name__}}")'>
+    <span class="ui-icon ui-icon-triangle-1-s {{question.__class__.__name__}}triangle"></span>
+    {{question.question}}
+</div>

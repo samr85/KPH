@@ -29,6 +29,8 @@ class Question:
         self.htmlTemplate = "questionDisplay.html"
         # HTML template to use to display for marking
         self.htmlMarkTemplate = "questionMark.html"
+        # Additional classes for the question
+        self.htmlClasses = []
 
         ## Do not modify these
         # A list of the team Answer structures refering to this question
@@ -72,6 +74,18 @@ class Question:
         else:
             answer.team.notifyTeam("%s answer: INCORRECT :("%(self.name), alert=True)
 
+class RoundHeading(Question):
+    def __init__(self):
+        super().__init__()
+        self.htmlTemplate = "RoundHeading.html"
+        self.score = 0
+        self.htmlClasses.append("roundHeading")
+
+class RoundQuestion(Question):
+    def __init__(self, roundClass):
+        super().__init__()
+        self.htmlClasses.append(roundClass.__name__)
+        self.htmlClasses.append("roundQuestion")
 
 class QuestionList:
     """ A container holding of all questions in the hunt """

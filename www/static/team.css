@@ -12,3 +12,11 @@
 .questionDisabled {
     color: grey;
 }
+
+.roundHeading {
+    font-weight: bold;
+    color: red;
+}
+.roundQuestion {
+    margin-left: 25px;
+}
