@@ -4,6 +4,7 @@
 {% set enableMessageBox = True %}
 {% set enableCountdown = True %}
 {% set enableLogout = True %}
+{% set enableBackToAdmin = False %}
 
 {% block predefinitions %}{% end %}
 
@@ -34,6 +35,9 @@
     {% end %}
     {% if enableLogout %}
       <a href="\login">Logout</a><br />
+    {% end %}
+        {% if enableBackToAdmin %}
+      <a href="\admin">Back to admin overview</a><br />
     {% end %}
 
     {% block contents %}

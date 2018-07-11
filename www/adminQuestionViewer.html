@@ -1,6 +1,11 @@
 {% extends "basepage.html" %}
 {% autoescape None %}
 
+{% block predefinitions %}
+    {% set enableLogout = False %}
+    {% set enableBackToAdmin = True %}
+{% end %}
+
 {%block title%}Admin Question Viewer{%end%}
 {%block extraheaders%}
 <script src="static/admin.js"></script>

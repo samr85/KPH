@@ -1,6 +1,11 @@
 {% extends "basepage.html" %}
 {% autoescape None %}
 
+{% block predefinitions %}
+    {% set enableLogout = False %}
+    {% set enableBackToAdmin = True %}
+{% end %}
+
 {%block title%}Admin Team Viewer: {{team.name}}{%end%}
 {%block extraheaders%}
 <script src="static/admin.js"></script>
