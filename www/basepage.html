@@ -20,6 +20,9 @@
     <script src="static/sections.js"></script>
     <script src="static/messaging.js"></script>
     <link rel="stylesheet" type="text/css" href="static/messaging.css" />
+    {% if enableCountdown %}
+      <link rel="stylesheet" type="text/css" href="static/countdown.css" />
+    {% end %}
     {% block extraheaders %}{% end %}
 </head>
 <body>

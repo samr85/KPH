@@ -70,9 +70,9 @@ class Question:
     def markNotification(self, answer):
         """ Overload this to change what messages (if any!) are sent to the user when the questions is marked """
         if answer.correct():
-            answer.team.notifyTeam("%s answer: CORRECT!"%(self.name), alert=True)
+            answer.team.notifyTeam('Correct: Answer "%s" to question "%s" accepted'%(answer.answer, self.name), alert=True)
         else:
-            answer.team.notifyTeam("%s answer: INCORRECT :("%(self.name), alert=True)
+            answer.team.notifyTeam('Incorrect: Answer "%s" to question "%s" rejected'%(answer.answer, self.name), alert=True)
 
 class RoundHeading(Question):
     def __init__(self):

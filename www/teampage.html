@@ -1,7 +1,7 @@
 {% extends "basepage.html" %}
 {% autoescape None %}
 
-{%block title%}{{ pageTitle }}{%end%}
+{%block title%}Team {{ team.fullName }}{%end%}
 {%block extraheaders%}
 <script src="static\teampage.js"></script>
 <link type="text/css" rel="stylesheet" href="static\team.css" />
@@ -9,10 +9,10 @@
 
 {%block contents %}
 
-<form action="Javascript:void(0);">
+<!--form action="Javascript:void(0);">
     <input type="text" id="adminMessage" />
     <button onclick="messageAdmin();">Send message to admins</button>
-</form>
+</form-->
 
 <div id="penaltyDiv"></div>
 

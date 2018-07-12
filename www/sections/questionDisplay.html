@@ -1,61 +1,63 @@
 {%autoescape None%}
 {%set question = answer.question%}
 
-<div class="question{%if not answer.enabled%} questionDisabled{%end%} {{" ".join(question.htmlClasses)}}">
-    <div class="questionName">Question: {{question.name}}</div>
-    {%if question.question%}
-    <div class="questionDescription">{{question.question}}</div>
-    {%end%}
-</div>
-<div class="answer {{" ".join(question.htmlClasses)}}">
-    {%if answer.correct()%}
-    <div class="answerCorrect">Correct answer submitted: {{answer.answer}}</div>
-    {%end%}
-    <div class="hints">
-        {%for hint in question.hints[:answer.hintCount]%}
-        <div class="hintText">{{hint["hint"]}}</div>
+<div class="questionContainer {{" ".join(question.htmlClasses)}}">
+    <div class="question{%if not answer.enabled%} questionDisabled{%end%}">
+        <div class="questionName">Question: {{question.name}}</div>
+        {%if question.question%}
+        <div class="questionDescription">{{question.question}}</div>
         {%end%}
-        {%if answer.canRequestHint() and not admin%}
-        <div class="hintRequest">
-            <button onclick="requestHint('{{question.id}}', {{question.hints[answer.hintCount]["cost"]}});">Request Hint</button> (cost: {{question.hints[answer.hintCount]["cost"]}} points)
+    </div>
+    <div class="answer">
+        {%if answer.correct()%}
+        <div class="answerCorrect">Correct answer: <span class="answerCorrectString">{{answer.answer}}</span></div>
+        {%end%}
+        <div class="hints">
+            {%for hint in question.hints[:answer.hintCount]%}
+            <div class="hintText">{{hint["hint"]}}</div>
+            {%end%}
+            {%if answer.canRequestHint() and not admin%}
+            <div class="hintRequest">
+                <button onclick="requestHint('{{question.id}}', {{question.hints[answer.hintCount]["cost"]}});">Request Hint</button> (cost: {{question.hints[answer.hintCount]["cost"]}} points)
+            </div>
+            {%end%}
+        </div>
+        {%if answer.previousAnswers %}
+        <div class="previousAnswers">
+            incorrect answers: <br />
+            {{ ", ".join(answer.previousAnswers)}}
         </div>
         {%end%}
-    </div>
-    {%if answer.previousAnswers %}
-    <div class="previousAnswers">
-        Previously submitted incorrect answers: <br />
-        {{ ", ".join(answer.previousAnswers)}}
-    </div>
-    {%end%}
-    {%if answer.awaitingAnswer()%}
-    <div class="submittedAnswer">
-        Submitted answer awaiting marking: {{answer.answer}}
-    </div>
-    {%elif answer.canSubmitAnswer() and not admin%}
-    <div class="answerRequest">
-        <form action="javascript:void(0)">
-            <input id="{{question.id}}Answer" type="text" name="" />
-            <button onclick="submitAnswer('{{question.id}}')">Submit answer</button>
-        </form>
-    </div>
-    {%end%}
-    {%if admin%}
-        <form action="javascript:void(0)">
-            <button onclick="adjustAnswer('hintLevel', '{{question.id}}', '{{answer.team.name}}', $('#{{question.id}}HintLevel')[0].value)">Change hint level</button>
-            <input id="{{question.id}}HintLevel" type="number" value="{{answer.hintCount}}" />
-        </form>
-        {%if answer.correct()%}
+        {%if answer.awaitingAnswer()%}
+        <div class="submittedAnswer">
+            Submitted answer awaiting marking: {{answer.answer}}
+        </div>
+        {%elif answer.canSubmitAnswer() and not admin%}
+        <div class="answerRequest">
             <form action="javascript:void(0)">
-                <button onclick="adjustAnswer('score', '{{question.id}}', '{{answer.team.name}}', $('#{{question.id}}Score')[0].value)">Change score</button>
-                <input id="{{question.id}}Score" type="number" value="{{answer.score}}" />[hints remove: {{answer.score - answer.getScore()}} points]
+                <input id="{{question.id}}Answer" type="text" name="" />
+                <button onclick="submitAnswer('{{question.id}}')">Submit answer</button>
             </form>
-            <form action="javascript:void(0)">
-                <button onclick="adjustAnswer('mark', '{{question.id}}', '{{answer.team.name}}', false)">Mark question as incorrect</button>
-            </form>
-        {%else%}
-            <form action="javascript:void(0)">
-                <button onclick="adjustAnswer('mark', '{{question.id}}', '{{answer.team.name}}', true)">Mark question as correct</button>
-            </form>
+        </div>
         {%end%}
-    {%end%}
+        {%if admin%}
+            <form action="javascript:void(0)">
+                <button onclick="adjustAnswer('hintLevel', '{{question.id}}', '{{answer.team.name}}', $('#{{question.id}}HintLevel')[0].value)">Change hint level</button>
+                <input id="{{question.id}}HintLevel" type="number" value="{{answer.hintCount}}" />
+            </form>
+            {%if answer.correct()%}
+                <form action="javascript:void(0)">
+                    <button onclick="adjustAnswer('score', '{{question.id}}', '{{answer.team.name}}', $('#{{question.id}}Score')[0].value)">Change score</button>
+                    <input id="{{question.id}}Score" type="number" value="{{answer.score}}" />[hints remove: {{answer.score - answer.getScore()}} points]
+                </form>
+                <form action="javascript:void(0)">
+                    <button onclick="adjustAnswer('mark', '{{question.id}}', '{{answer.team.name}}', false)">Mark question as incorrect</button>
+                </form>
+            {%else%}
+                <form action="javascript:void(0)">
+                    <button onclick="adjustAnswer('mark', '{{question.id}}', '{{answer.team.name}}', true)">Mark question as correct</button>
+                </form>
+            {%end%}
+        {%end%}
+    </div>
 </div>

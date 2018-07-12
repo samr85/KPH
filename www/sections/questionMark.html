@@ -12,7 +12,7 @@
     {%end%}
 
     {# Do we expect the answer to be correct?#}
-    {%if answer.answer.lower() in answers%}
+    {%if answer.answer.lower() in [x.lower() for x in answers]%}
       {%set correct = "Correct"%}
       {%set incorrect = "Incorrect"%}
     {%else%}

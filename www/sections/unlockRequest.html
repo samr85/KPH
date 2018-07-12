@@ -1,0 +1,40 @@
+{%autoescape None%}
+{% set question = answer.question %}
+
+{% if admin %}
+<div class="questionContainer{% if not answer.enabled %} questionDisabled{% end %} {{" ".join(question.htmlClasses)}}">
+    <div class="questionName">{{question.name}}
+    {% if answer.correct() %}
+        - unlocked
+    {% else %}
+        - locked
+    {% end %}
+</div>
+{% elif answer.awaitingAnswer() %}
+<div class="questionContainer {{" ".join(question.htmlClasses)}}">
+    <div class="submittedAnswer">
+        Awaiting quiz start
+    </div>
+</div>
+{%elif answer.canSubmitAnswer()%}
+<div class="questionContainer {{" ".join(question.htmlClasses)}}">
+    <div class="questionName">{{question.name}}
+    {%if question.question%}
+    <div class="questionDescription">{{question.question}}</div>
+    {%end%}
+    <input id="{{question.id}}Answer" type="hidden" name="" value="1" />
+    <!-- this should probably be a function call, rather than all in the onclick string to get round having escape issues! -->
+    <button onclick='
+        $("<div title=\"Round switching\">Switching round will unlock all hints (including associated cost) for all currently unanswered questions.  Are you sure you want to do this?</div>").dialog({
+            buttons: {
+                "Confirm": function () {
+                    $(this).dialog("close");
+                    submitAnswer("{{question.id}}");
+                },
+                "Cancel": function () {
+                    $(this).dialog("close");
+                }
+            }
+        });'>Unlock this round</button>
+</div>
+{%end%}

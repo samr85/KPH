@@ -1,22 +1,30 @@
-.questionDiv {
-    margin-top: 10px;
+.questionContainer {
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 .questionName {
     font-weight: bold;
     color: blue;
 }
-.questionListSection, .adminQuestionListSectionn {
-    margin-top: 25px;
-}
-
 .questionDisabled {
     color: grey;
 }
 
 .roundHeading {
+    margin-top: 8px;
+    margin-bottom: 8px;
     font-weight: bold;
     color: red;
+    cursor: pointer;
 }
 .roundQuestion {
-    margin-left: 25px;
+    padding-left: 15px;
+    border-left: 2px solid blue;
+}
+
+.answerCorrect {
+    font-weight: bold;
+}
+.answerCorrectString {
+    color: green;
 }
