@@ -3,7 +3,7 @@
 
 {% if admin %}
 <div class="questionContainer{% if not answer.enabled %} questionDisabled{% end %} {{" ".join(question.htmlClasses)}}">
-    <div class="questionName">{{question.name}}
+    <div class="questionName">{{question.name}}</div>
     {% if answer.correct() %}
         - unlocked
     {% else %}
@@ -18,10 +18,6 @@
 </div>
 {%elif answer.canSubmitAnswer()%}
 <div class="questionContainer {{" ".join(question.htmlClasses)}}">
-    <div class="questionName">{{question.name}}
-    {%if question.question%}
-    <div class="questionDescription">{{question.question}}</div>
-    {%end%}
     <input id="{{question.id}}Answer" type="hidden" name="" value="1" />
     <!-- this should probably be a function call, rather than all in the onclick string to get round having escape issues! -->
     <button onclick='

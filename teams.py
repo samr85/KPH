@@ -35,7 +35,6 @@ class Team:
             raise ErrorMessage("Team does not have access to question: %s"%(questionId))
         answerItem = self.questionAnswers[questionId]
         answerItem.submitAnswer(answerString, time)
-        self.notifyTeam('Answer "%s" submitted for question "%s"'%(answerString, answerItem.question.name))
 
     def requestHint(self, questionId):
         if questionId not in self.questionAnswers:
