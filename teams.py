@@ -151,12 +151,12 @@ def createTeam(server, messageList, _time):
 def setTeamPenalty(_server, messageList, _time):
     teamName = messageList[0]
     scorePenalty = int(messageList[1])
-    reason = messageList[2]
+    reason = html.escape(base64.b64decode(messageList[2]).decode())
     team = CTX.teams[teamName]
     team.penalty = scorePenalty
     team.penaltyReason = reason
     team.penaltyId += 1
-    team.notifyTeam("You have been given a penalty of %d points for reason: %s"%(scorePenalty, reason), alert=True)
+    team.notifyTeam("Penalty: You have been given a penalty of %d points for reason:<br />%s"%(scorePenalty, reason), alert=True)
     sections.pushSection("penalty", 0, team)
     sections.pushSection("adminPenalty", 0, team)
 

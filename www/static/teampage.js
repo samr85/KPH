@@ -19,7 +19,12 @@ function requestHint(question, value)
         valueStr += "s";
     }
 
-    $("<div title='Requesting hint'>Requesting this hint will reduce the value of this question by " + valueStr + ", are you sure?</div>").dialog({
+    if ($('#hintRequest').length)
+    {
+        return;
+    }
+
+    $("<div id='hintRequest' title='Requesting hint'>Requesting this hint will reduce the value of this question by " + valueStr + ", are you sure?</div>").dialog({
         buttons: {
             "Yes": function () {
                 $(this).dialog("close");
