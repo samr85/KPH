@@ -167,7 +167,7 @@ class PenaltySectionHandler(sections.SectionHandler):
         self.requireTeam = True
 
     def requestSection(self, requestor, sectionId):
-        if sectionId == "0" and requestor.team.penalty > 0:
+        if sectionId == "0" and requestor.team.penalty != 0:
             return (requestor.team.penaltyId, 0, SECTION_LOADER.load("penaltyDisplay.html").generate(team=requestor.team, admin=False))
         return (0, 0, None)
 

@@ -27,13 +27,14 @@ function requestHint(question, value)
     $("<div id='hintRequest' title='Requesting hint'>Requesting this hint will reduce the value of this question by " + valueStr + ", are you sure?</div>").dialog({
         buttons: {
             "Yes": function () {
-                $(this).dialog("close");
+                $(this).dialog("destroy");
                 sendMessage("reqHint " + question);
             },
             "No": function () {
-                $(this).dialog("close");
+                $(this).dialog("destroy");
             }
-        }
+        },
+        modal: true
     });
 }
 

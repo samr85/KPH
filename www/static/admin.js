@@ -29,7 +29,8 @@ function mark(id, mark) {
                 "Cancel": function () {
                     $(this).dialog("close");
                 }
-            }
+            },
+            modal: true
         });
         return;
     }
