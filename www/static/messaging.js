@@ -30,7 +30,7 @@ $(function createWebSocket() {
         SOCKET.onopen = function (msg) {
             if (connectionBroken) {
                 connectionBroken = false;
-                addLogMessage("Connection reestablished");
+                closeMessageById("connectionBroken");
             }
             // Tell the python handler what sections we're interested in
             if (requestSections) {
@@ -52,12 +52,12 @@ $(function createWebSocket() {
                 window[messageType + "Handler"](messageContents);
             }
             else {
-                addLogMessage(messageString);
+                errorHandler("Recieved unknown command: <br />" + messageString);
             }
         };
         SOCKET.onclose = function (msg) {
             if (connectionBroken === false) {
-                logError("Connection lost, attempting to reconnect...");
+                logError("Connection lost, attempting to reconnect...", "connectionBroken");
                 connectionBroken = true;
             }
             setTimeout(createWebSocket, 3000);
