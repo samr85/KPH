@@ -81,7 +81,7 @@ function updateCountdown(id, sortValue, data) {
         clearInterval(countdownInterval);
     }
     if (countdownString) {
-        var newHTML = "<div>" + countdownString + "</div><div id='countdownTime'></div>";
+        var newHTML = "<div class='countdownMessage'>" + countdownString + "</div><div id='countdownTime'></div>";
         $("#countdownDiv").html(newHTML);
         countdownTick();
         setInterval(countdownTick, 500);

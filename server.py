@@ -56,16 +56,22 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         CTX.messagingClients.addClient(self)
 
     def on_message(self, message):
-        if not self.validConnection:
-            print("ERROR: Got message from invalid connection: " + message)
-            return
-        print('MSG Rx: ' + message)
         try:
+            if not self.validConnection:
+                print("ERROR: Got message from invalid connection: " + message)
+                return
+            print('MSG Rx: ' + message)
             messageHandler.handleMessage(self, message)
         except ErrorMessage as ex:
             errMsg = "Error: %s"%(ex.message)
             self.write_message(errMsg)
             self.write_message("alert %s"%(base64.b64encode(errMsg.encode()).decode()))
+        except UnicodeError:
+            print('ERROR: Rx message with invalid unicode')
+            errMsg = "Error: invalid characters in message"
+            self.write_message(errMsg)
+            self.write_message("alert %s"%(base64.b64encode(errMsg.encode()).decode()))
+            return
 
     def on_close(self):
         CTX.messagingClients.removeClient(self)
@@ -116,7 +122,7 @@ class TeamRequestHandler(RequestHandler):
 
 class TeamPage(TeamRequestHandler):
     def getTeam(self):
-        self.render("www\\teampage.html", answers=self.team.questionAnswers.values(), pageTitle="Team %s"%(self.team.name))
+        self.render("www\\teampage.html", answers=self.team.questionAnswers.values(), team=self.team)
 
 class AdminRequestHandler(RequestHandler):
     def get(self):

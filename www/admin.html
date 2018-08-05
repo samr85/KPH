@@ -31,7 +31,13 @@
         </div>
         <h3>Send Messages</h3>
         <form action="Javascript:void(0);">
-            team name ("all" for announcement to all teams): <input type="text" id="teamMessageName" /><br />
+            team name: 
+            <select id="teamMessageName">
+                <option value="all">all</option>
+                {%for team in CTX.teams%}
+                <option value="{{team.name}}">{{team.fullName}}</option>
+                {%end%}
+            </select>
             message: <input type="text" id="teamMessage" /><br />
             <button onclick="messageTeam();">Send message to team</button>
         </form>

@@ -10,8 +10,9 @@ from commandRegistrar import handleCommand
 from controller import CTX
 
 class Team:
-    def __init__(self, name, password):
+    def __init__(self, name, password, fullName = None):
         self.name = name
+        self.fullName = fullName or name
         self.questionAnswers = {}
         self.messages = []
         self.lock = RLock()
@@ -34,7 +35,6 @@ class Team:
             raise ErrorMessage("Team does not have access to question: %s"%(questionId))
         answerItem = self.questionAnswers[questionId]
         answerItem.submitAnswer(answerString, time)
-        self.notifyTeam("Answer %s submitted for question %s"%(answerString, questionId))
 
     def requestHint(self, questionId):
         if questionId not in self.questionAnswers:
@@ -89,7 +89,7 @@ class TeamScore:
 class TeamList:
     def __init__(self):
         self.lock = Lock()
-        self.teamList = {}
+        self.teamList = collections.OrderedDict()
 
     # Make this class act as a dictionay of teams, so can just do for team in CTX.teams or CTX.teams[teamName]
     def __iter__(self):
@@ -99,7 +99,7 @@ class TeamList:
     def __getitem__(self, key):
         return self.getTeam(key)
 
-    def createTeam(self, name, password):
+    def createTeam(self, name, password, fullName = None):
         """ Make a new team """
         with self.lock:
             name = html.escape(name)
@@ -108,7 +108,7 @@ class TeamList:
             if name.lower() in ["all", "admin"]:
                 raise ErrorMessage("Team name %s is not allowed"%(name))
             print("Creating new team: %s"%(name))
-            newTeam = Team(name, password)
+            newTeam = Team(name, password, fullName)
             self.teamList[name] = newTeam
             return newTeam
 
@@ -150,12 +150,12 @@ def createTeam(server, messageList, _time):
 def setTeamPenalty(_server, messageList, _time):
     teamName = messageList[0]
     scorePenalty = int(messageList[1])
-    reason = messageList[2]
+    reason = html.escape(base64.b64decode(messageList[2]).decode())
     team = CTX.teams[teamName]
     team.penalty = scorePenalty
     team.penaltyReason = reason
     team.penaltyId += 1
-    team.notifyTeam("You have been given a penalty of %d points for reason: %s"%(scorePenalty, reason), alert=True)
+    team.notifyTeam("Penalty: You have been given a penalty of %d points for reason:<br />%s"%(scorePenalty, reason), alert=True)
     sections.pushSection("penalty", 0, team)
     sections.pushSection("adminPenalty", 0, team)
 
@@ -166,7 +166,7 @@ class PenaltySectionHandler(sections.SectionHandler):
         self.requireTeam = True
 
     def requestSection(self, requestor, sectionId):
-        if sectionId == "0" and requestor.team.penalty > 0:
+        if sectionId == "0" and requestor.team.penalty != 0:
             return (requestor.team.penaltyId, 0, SECTION_LOADER.load("penaltyDisplay.html").generate(team=requestor.team, admin=False))
         return (0, 0, None)
 

@@ -81,7 +81,8 @@ class Answer:
             self.question.completed(self.team)
         else:
             self.status = INCORRECT
-            self.previousAnswers.append(self.answer)
+            if self.answer not in self.previousAnswers:
+                self.previousAnswers.append(self.answer)
         self.question.markNotification(self)
         self.update()
 
@@ -89,6 +90,7 @@ class Answer:
         """ Create the HTML to display this to the user """
         version = self.version
         html = SECTION_LOADER.load(self.question.htmlTemplate).generate(answer=self, admin=admin)
+        html = html.replace(b"\n", b"")
         return (version, self.question.id, html)
 
     def renderAnswerQueue(self):

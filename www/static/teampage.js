@@ -13,16 +13,28 @@ function submitAnswer(question)
 
 function requestHint(question, value)
 {
-    $("<div title='Requesting hint'>Requesting this hint will reduce the value of this question by " + value + "points, are you sure you want to do this ?</div > ").dialog({
+    var valueStr = value + "point";
+    if (value !== 1)
+    {
+        valueStr += "s";
+    }
+
+    if ($('#hintRequest').length)
+    {
+        return;
+    }
+
+    $("<div id='hintRequest' title='Requesting hint'>Requesting this hint will reduce the value of this question by " + valueStr + ", are you sure?</div>").dialog({
         buttons: {
-            "Confirm": function () {
-                $(this).dialog("close");
+            "Yes": function () {
+                $(this).dialog("destroy");
                 sendMessage("reqHint " + question);
             },
-            "Cancel": function () {
-                $(this).dialog("close");
+            "No": function () {
+                $(this).dialog("destroy");
             }
-        }
+        },
+        modal: true
     });
 }
 

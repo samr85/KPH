@@ -61,7 +61,7 @@ class Question:
 
     def submitAnswer(self, answer):
         """ Overload if you want something special to happen when an answer is submitted """
-        pass
+        answer.team.notifyTeam('Answer "%s" submitted for question "%s"'%(answer.answer, self.name))
 
     def submissionCheck(self, answer, answerString, currentTime):
         """ Overload this if there might be a special reason that answers (or a specific answer) can't be submitted.  Return with a string to refuse submission """
@@ -70,11 +70,12 @@ class Question:
     def markNotification(self, answer):
         """ Overload this to change what messages (if any!) are sent to the user when the questions is marked """
         if answer.correct():
-            answer.team.notifyTeam("%s answer: CORRECT!"%(self.name), alert=True)
+            answer.team.notifyTeam('Correct: Answer "%s" to question "%s" accepted'%(answer.answer, self.name), alert=True)
         else:
-            answer.team.notifyTeam("%s answer: INCORRECT :("%(self.name), alert=True)
+            answer.team.notifyTeam('Incorrect: Answer "%s" to question "%s" rejected'%(answer.answer, self.name), alert=True)
 
 class RoundHeading(Question):
+    roundName = ""
     def __init__(self):
         super().__init__()
         self.htmlTemplate = "RoundHeading.html"
@@ -88,7 +89,7 @@ class RoundQuestion(Question):
         self.htmlClasses.append("roundQuestion")
 
 class QuestionList:
-    """ A container holding of all questions in the hunt """
+    """ A container holding of all questions in the quiz """
     questionList = collections.OrderedDict()
     lock = Lock()
 

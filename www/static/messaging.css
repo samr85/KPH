@@ -1,6 +1,6 @@
 
 #messageList {
-    height:3.6em;
+    height:2.4em;
     line-height: 1.2em;
     overflow-y:auto;
 }
@@ -22,6 +22,14 @@
 #messageList .announcement {
     color: darkred;
     font-weight: bold;
+}
+
+#messageBoxToggleHide {
+    display: none;
+}
+
+.messageBoxToggle {
+    cursor: pointer;
 }
 
 #countdownTime > pre {

@@ -2,6 +2,6 @@
 
 <select name="teamSelect">
 {%for team in CTX.teams%}
-    <option value="{{team.name}}">{{team.name}}</option>
+    <option value="{{team.name}}">{{team.fullName}}</option>
 {%end%}
 </select>

@@ -11,7 +11,14 @@ function alertHandler(message) {
         }
         message = message.substr(colonPos + 1);
     }
-    $("<div title='" + msgType + "'>" + message + "</div>").dialog();
+    $("<div title='" + msgType + "'>" + message + "</div>").dialog({
+        buttons: {
+            "OK": function () {
+                $(this).dialog("close");
+            }
+        },
+        modal: true
+        });
 }
 
 function logError(message)
@@ -66,3 +73,17 @@ function categoriseMessages(section) {
     cont.scrollTop = cont.scrollHeight;
 }
 initialiseSection("message", standardSection("messageList", categoriseMessages), []);
+
+function messageBoxToggle(dir) {
+    if (dir) {
+        $('#messageBoxToggleHide').show();
+        $('#messageBoxToggleShow').hide();
+        $('#messageList').css("height", "auto");
+    } else {
+        $('#messageBoxToggleHide').hide();
+        $('#messageBoxToggleShow').show();
+        $('#messageList').css("height", "2.4em");
+        var cont = $("#messageList")[0];
+        cont.scrollTop = cont.scrollHeight;
+    }
+}
