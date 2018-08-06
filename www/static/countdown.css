@@ -5,3 +5,6 @@
 .countdownMessage {
     color: red;
 }
+#countdownTime > pre {
+    display: inline-block;
+}

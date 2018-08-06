@@ -21,32 +21,14 @@ function alertHandler(message) {
         });
 }
 
-function logError(message)
+function logError(message, id)
 {
     message = "Error: " + message;
     console.log(message);
-    addLogMessage(message);
+    messageBox(message, "Error", "errorMessageBox", id)
 }
 
-function addLogMessage(message)
-{
-    /* Get last element currently in the log */
-    var holder = $('#messageList')[0];
-    var section = sectionTypes.get("message");
-    if (holder === undefined || section === undefined) {
-        console.log("Failed to find message holder for message:");
-        console.log(message);
-        return;
-    }
-    var sort = "";
-    var lastElement = holder.lastChild;
-    if (lastElement) {
-        sort = $(lastElement).data("sort");
-    }
-    sort += "-";
-    section.update("extra" + sort, sort, message);
-}
-
+var messageBoxToggleShown = false
 function categoriseMessages(section) {
     var message = section.innerHTML;
     var colonPos = message.indexOf(":");
@@ -71,6 +53,11 @@ function categoriseMessages(section) {
     }
     var cont = $("#messageList")[0];
     cont.scrollTop = cont.scrollHeight;
+    if (!messageBoxToggleShown && $('#messageList')[0].childElementCount > 2)
+    {
+        messageBoxToggleShown = true;
+        $('#messageBoxToggleShow').show();
+    }
 }
 initialiseSection("message", standardSection("messageList", categoriseMessages), []);
 
@@ -78,11 +65,11 @@ function messageBoxToggle(dir) {
     if (dir) {
         $('#messageBoxToggleHide').show();
         $('#messageBoxToggleShow').hide();
-        $('#messageList').css("height", "auto");
+        $('#messageList').css("max-height", "none");
     } else {
         $('#messageBoxToggleHide').hide();
         $('#messageBoxToggleShow').show();
-        $('#messageList').css("height", "2.4em");
+        $('#messageList').css("max-height", "2.4em");
         var cont = $("#messageList")[0];
         cont.scrollTop = cont.scrollHeight;
     }

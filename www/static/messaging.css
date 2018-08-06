@@ -1,6 +1,6 @@
 
 #messageList {
-    height:2.4em;
+    max-height: 2.4em;
     line-height: 1.2em;
     overflow-y:auto;
 }
@@ -27,11 +27,10 @@
 #messageBoxToggleHide {
     display: none;
 }
+#messageBoxToggleShow {
+    display: none;
+}
 
 .messageBoxToggle {
     cursor: pointer;
-}
-
-#countdownTime > pre {
-    display: inline-block;
 }

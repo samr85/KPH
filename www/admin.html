@@ -4,17 +4,16 @@
 {%block title%}Admin Page{%end%}
 {%block extraheaders%}
 <script src="static/admin.js"></script>
+<script src="static/beeper.js"></script>
 <link rel="stylesheet" type="text/css" href="static/admin.css" />
 <script>
     $(function () {
         $("#accordion").accordion({ heightStyle: "content", collapsible: true });
     });
     function postSectionUpdate() {
-        console.log("postSectionUpdate");
         $("#accordion").accordion("refresh");
     }
-
-    initialiseSection("answerQueue", standardSection("answerQueue"), []);
+    initialiseSection("answerQueue", standardSection("answerQueue", beeper), []);
 </script>
 <style>
     html, body {height: 100%; margin:0; box-sizing: border-box;}
@@ -29,6 +28,7 @@
         <div id="answerQueue">
             No answers currently
         </div>
+
         <h3>Send Messages</h3>
         <form action="Javascript:void(0);">
             team name: 
@@ -41,11 +41,13 @@
             message: <input type="text" id="teamMessage" /><br />
             <button onclick="messageTeam();">Send message to team</button>
         </form>
+
         <h3>Team Viewer</h3>
         <form method="get" action="adminTeamViewer">
             {% include components/teamListRadio.html %}
             <input type="submit" value="View this team" />
         </form>
+
         <h3>Other Pages</h3>
         <div>
             <a href="score">score page</a><br />
