@@ -83,7 +83,7 @@ def datetimeToJsString(dtime):
 
 class TeamScore:
     def __init__(self, team):
-        self.name = team.name
+        self.name = team.fullName
         self.time, self.score = team.getScore()
 
 class TeamList:
