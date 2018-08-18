@@ -7,60 +7,20 @@
 {%end%}
 
 {%block extraheaders%}
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <link rel="stylesheet" type="text/css" href="static/score.css" />
 {%end%}
 {%block title%}Score{%end%}
 
 {%block contents %}
-    <div id="scoreHistory">
-        <script>
-            google.charts.load('current', { packages: ['corechart', 'line'] });
-            google.charts.setOnLoadCallback(drawHistory);
-            function drawHistory() {
-                var data = new google.visualization.DataTable();
-                data.addColumn('datetime', 'scoreTime');
-                {% set index = 0 %}
-                {% set rIndex = 0 %}
-                {% for team, hist in teamScoreHistory.items() %}
-                    {% set index += 1 %}
-                    data.addColumn('number', '{{team}}')
-                    {% for time, score, strtime in hist %}
-                        data.addRow()
-                        data.setCell({{rIndex }}, 0, new Date{{ strtime }})
-                        data.setCell({{rIndex }}, {{index }}, {{score}})
-                        {% set rIndex += 1 %}
-                    {% end %}
-                {%end%}
-                var options = {
-                    hAxis: { title: 'Submission time' },
-                    vAxis: {
-                        title: 'Score',
-                        viewWindow: {min: 0, max: 100}
-                    }
-                };
-                var chart = new google.visualization.LineChart(document.getElementById('scoreHistory'));
-                chart.draw(data, options);
-            }
-        </script>
-    </div>
-        <!--
-    {%for team, hist in teamScoreHistory.items() %}
-        {{team}}:<br />
-        {%for pos in hist %}
-            {{pos[1]}}: {{pos[0]}}
-        {%end%}
-        <br />
-    {%end%}
-    </div>-->
 
     <div class="scoreList">
+    <pre>
+{{questionList}}	
     {% for teamScore in teamScoreList %}
-        <span class="teamName">{{teamScore.name}}:</span>
-        <!--span class="teamScoreTime">{{teamScore.time}}</span-->
-        <span class="teamScore">{{teamScore.score}}</span>
-        <br />
+        <span class="teamName">{{teamScore.name}}{{teamScore.fullScore}} {{teamScore.score}}</span>
     {% end %}
+    </pre>
     </div>
+
 
 {%end%}

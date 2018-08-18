@@ -5,6 +5,7 @@ import html
 import base64
 
 import sections
+
 from globalItems import ErrorMessage, startTime, SECTION_LOADER
 from commandRegistrar import handleCommand
 from controller import CTX
@@ -43,15 +44,19 @@ class Team:
 
     def getScore(self):
         score = 0
+        scoreHist = dict()
         lastScoreTime = datetime.datetime.now()
-        for answer in self.questionAnswers.values():
+        for id, answer in self.questionAnswers.items():
             thisScore = answer.getScore()
             if thisScore:
                 score += thisScore
                 if answer.answeredTime < lastScoreTime:
                     lastScoreTime = answer.answeredTime
+                scoreHist[id] = str(thisScore)
+            else: 
+                scoreHist[id] = '0'
         score -= self.penalty
-        return lastScoreTime, score
+        return lastScoreTime, score, self.renderScore(scoreHist)
 
     def getScoreHistory(self):
         answers = self.questionAnswers.values()
@@ -70,6 +75,17 @@ class Team:
         if questionId in self.questionAnswers:
             return self.questionAnswers[questionId].renderQuestion(admin)
         raise ErrorMessage("Invalid question: %s"%(questionId))
+    
+    def renderScore(self, fullScore):
+        scoreLine = ""
+        for question in CTX.questions:
+            if not(question.noScore):
+                #scoreLine += " "+question.name+" "
+                if question.id in fullScore.keys():
+                    scoreLine += fullScore[question.id]
+                else:
+                    scoreLine += "x"
+        return scoreLine      
 
     def listQuestionIdVersions(self):
         versionList = []
@@ -84,7 +100,7 @@ def datetimeToJsString(dtime):
 class TeamScore:
     def __init__(self, team):
         self.name = team.fullName
-        self.time, self.score = team.getScore()
+        self.time, self.score, self.fullScore = team.getScore()
 
 class TeamList:
     def __init__(self):

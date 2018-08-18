@@ -18,6 +18,8 @@ class Question:
         # How many points are scored for getting the question correct
         # 0 means force the admin to enter a score when marking it
         self.score = 5
+        # Display the score on the scoreboard?
+        self.noScore = False
         # If the hint cost isn't specified for individual hints, they cost this much
         self.defaultHintCost = 1
         # List of the valid answers to the question
@@ -107,6 +109,9 @@ class QuestionList:
         return self.questionList.__len__()
     def __getitem__(self, key):
         return self.questionList.__getitem__(key)
+    
+    def getNames(self):
+        return " ".join([question.name for question in self.questionList.values() if not(question.noScore)])
 
 def registerQuestion(question):
     return QuestionList.registerQuestion(question)
