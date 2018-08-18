@@ -40,7 +40,7 @@ class Question:
         # List of hints - modify using addHint()
         self.hints = []
         # Id for the question, used for communicating with clients
-        self.id = str(Question._nextId)
+        self.id = "%03d"%(Question._nextId)
         Question._nextId += 1
 
     def addHint(self, hintHtml, cost=-1):

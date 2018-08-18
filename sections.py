@@ -177,7 +177,7 @@ class TeamMessageLogHandler(SectionHandler):
             raise InvalidRequest("message number %s is not an integeter"%(sectionId)) from None
         if hasattr(message, "encode"):
             message = message.encode()
-        return (1, msgIndex, message)
+        return (1, "%03d"%(msgIndex), message)
 
     def requestUpdateList(self, requestor):
         versionList = []

@@ -36,7 +36,7 @@ def loadQuestionList():
     import KPHQuestions
 
 def loadTeamList():
-    CTX.teams.createTeam("j", "j")
+    CTX.teams.createTeam("j", "j","Full Team Name")
     CTX.teams.createTeam("c", "c")
     CTX.teams.createTeam("t", "t")
     CTX.teams.createTeam("a", "a")

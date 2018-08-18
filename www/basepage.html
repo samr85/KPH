@@ -19,6 +19,7 @@
     <script src="static/jquery-ui-1.12.1/jquery-ui.min.js"></script>
     <script src="static/sections.js"></script>
     <script src="static/messaging.js"></script>
+    <script src="static/beeper.js"></script>
     <link rel="stylesheet" type="text/css" href="static/messaging.css" />
     {% if enableCountdown %}
       <link rel="stylesheet" type="text/css" href="static/countdown.css" />
@@ -27,16 +28,7 @@
 </head>
 <body>
     {% if enableMessageBox %}
-      <script src="static/messageBox.js"></script>
-      <div id="messageList"></div>
-      <div id="messageBoxToggleShow" class="messageBoxToggle" onclick="messageBoxToggle(true)">
-        <span class="ui-icon ui-icon-triangle-1-s"></span>
-        display all messages
-      </div>
-      <div id="messageBoxToggleHide" class="messageBoxToggle" onclick="messageBoxToggle(false)">
-        <span class="ui-icon ui-icon-triangle-1-n"></span>
-        shrink message box
-      </div>
+      {% include components/messageBox.html %}
     {% else %}
       <script src="static/messageBoxDisabled.js"></script>
     {% end %}
