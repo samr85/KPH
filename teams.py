@@ -3,6 +3,7 @@ import datetime
 import collections
 import html
 import base64
+import re
 
 import sections
 
@@ -35,7 +36,8 @@ class Team:
         if questionId not in self.questionAnswers:
             raise ErrorMessage("Team does not have access to question: %s"%(questionId))
         answerItem = self.questionAnswers[questionId]
-        answerItem.submitAnswer(answerString, time)
+        answerString = html.unescape(answerString)
+        answerItem.submitAnswer(re.sub('\W+', '', answerString), time)
 
     def requestHint(self, questionId):
         if questionId not in self.questionAnswers:
