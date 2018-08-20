@@ -31,7 +31,9 @@ def initialise(reloading=False):
     if reloading:
         startHunt()
     else:
-        scheduler.runIn(5, startHunt)
+        for question in CTX.questions:
+            if question.unlockOn == "initial":
+                CTX.enableQuestion(question)
 
 # Dummy examples of roughly what we might want this file to look like
 def loadQuestionList():
@@ -45,14 +47,10 @@ def loadTeamList():
 
 # Use @handleCommand if you want to be able to send any messages to this code from the browsers.
 @handleCommand("startHunt", adminRequired=True)
-def startHunt():
+def startHunt(_server = None, _messageList = None, _time = None):
     CTX.state.huntStarted = True
     print("Hunt is starting!!!")
-    for question in CTX.questions:
-        if question.unlockOn == "initial":
-            CTX.enableQuestion(question)
-    #CTX.disableQuestion(question, CTX.teams[html.escape("<b>b'b")])
-    #scheduler.runIn(6, finalPuzzleCallback)
+
     scheduler.runIn(9000, endHuntCallback)
     scheduler.runIn(5400, metaCallback)
     scheduler.displayCountdown("Time remaining", 9000)

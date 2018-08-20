@@ -3,8 +3,10 @@ import collections
 import datetime
 import contextlib
 import traceback
+import base64
 
 import sections
+from commandRegistrar import handleCommand
 
 class PuzzleScheduler:
     TriggerEvent = collections.namedtuple("TriggerEvent", ["callTime", "callback", "args", "kwargs"])
@@ -101,3 +103,19 @@ class CountdownSectionHandler(sections.SectionHandler):
 #def fn(a, b=None, c=None):
 #    print("called with: (%s, %s, %s)"%(a, b, c))
 #scheduler.runIn(2, fn, args="a", kwargs={"c": "asdf"})
+
+@handleCommand("setTimer", adminRequired=True, messageListLen=2)
+def setTimer(_server, messageList, _time):
+    commandb64 = messageList[0]
+    delay = messageList[1]
+    delaySp = delay.split(":", 2)
+    delay = int(delaySp.pop(0))
+    if delaySp:
+        # minutes were also specified, so will have been what's already in the number
+        delay *= 60
+        delay += int(delaySp.pop(0))
+    if delaySp:
+        # hours were also specified, so will have been what's already in the number
+        delay *= 60
+        delay += int(delaySp.pop(0))
+    displayCountdown(base64.b64decode(commandb64).decode(), delay)

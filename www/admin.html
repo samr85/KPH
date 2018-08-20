@@ -53,5 +53,24 @@
             <a href="score">score page</a><br />
             <a href="adminQuestionViewer">question viewer</a>
         </div>
+
+        <h3>Hunt Controls</h3>
+        <div>
+            <button onclick="sendMessage('startHunt')" {% if CTX.state.huntStarted %}disabled{% end %}>Start Hunt</button><br /><br />
+            <script type="text/javascript">
+                function changeTimer() {
+                    validLetters = /^[0-9:]+$/;
+                    if (validLetters.test($('#timerDelay')[0].value)) {
+                        sendMessage('setTimer ' + window.btoa($("#timerMessage")[0].value) + " " + $('#timerDelay')[0].value);
+                    } else {
+                        logError("Invalid timer delay - should be in form seconds, mm:ss or hh:mm:ss");
+                    }
+                }
+            </script>
+            Display Timer:<br />
+            <input type="text" id="timerMessage" placeholder="Message to display" style="width: 100%" /><br />
+            <input type="text" id="timerDelay" placeholder="Delay" style="width: 8ch" /> (secs, mm:ss, or hh:mm:ss)<br />
+            <button onclick="changeTimer()">Set Timer</button>
+        </div>
     </div>
 {%end%}
