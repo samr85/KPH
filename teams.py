@@ -96,6 +96,11 @@ class Team:
         versionList.sort(key=lambda x:x[0])
         return versionList
 
+    def scoreVersion(self):
+        # very much a hack - this will update more often than it should do...
+        return self.penaltyId + sum([x.version for x in self.questionAnswers.values()])
+
+
 def datetimeToJsString(dtime):
     return str(tuple([i for i in dtime.timetuple()][:6]))
 
@@ -176,6 +181,7 @@ def setTeamPenalty(_server, messageList, _time):
     team.notifyTeam("Penalty: You have been given a penalty of %d points for reason:<br />%s"%(scorePenalty, reason), alert=True)
     sections.pushSection("penalty", 0, team)
     sections.pushSection("adminPenalty", 0, team)
+    sections.pushSection("scoreBoard", 1)
 
 @sections.registerSectionHandler("penalty")
 class PenaltySectionHandler(sections.SectionHandler):

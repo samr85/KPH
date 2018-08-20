@@ -3,6 +3,7 @@ import html
 import scheduler
 from controller import CTX
 from commandRegistrar import handleCommand
+from sections import SectionHandler, registerSectionHandler
 
 import texttable
 
@@ -59,14 +60,24 @@ def endHuntCallback():
     print("Hunt has finished!")
     for question in CTX.questions:
         CTX.disableQuestion(question)
-            
-def metaCallback():
 
+def metaCallback():
     for team in CTX.teams:
         if CTX.state.metaQuestion.id not in team.questionAnswers:
             team.notifyTeam("Meta puzzle unlocked automatically!", alert=True)
     CTX.enableQuestion(CTX.state.metaQuestion)
-    
+
+@registerSectionHandler("scoreBoard")
+class ScoreBoardHandler(SectionHandler):
+    def requestSection(self, requestor, sectionId):
+        return (1, scoreVersion(), renderScore().encode())
+
+    def requestUpdateList(self, requestor):
+        return [(1, scoreVersion())]
+
+def scoreVersion():
+    return sum([team.scoreVersion() for team in CTX.teams])
+
 def renderScore():
     questionList = CTX.questions.getNames()
     teamScores = CTX.teams.getScoreList()

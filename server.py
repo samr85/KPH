@@ -149,7 +149,7 @@ class AdminQuestionViewerPage(AdminRequestHandler):
 
 class ScorePage(RequestHandler):
     def get(self):
-        self.render("www\\score.html", startTime=startTime,scoreBoard=huntSpecific.renderScore(),  questionList=CTX.questions.getNames(), )
+        self.render("www\\score.html")
 
 class Login(RequestHandler):
     def get(self):

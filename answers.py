@@ -50,6 +50,9 @@ class Answer:
         sections.pushSection("adminQuestion", self.question.id, self.team.name)
         sections.pushSection("adminQuestionViewer", self.question.id)
         sections.pushSection("answerQueue", self.id)
+        ## hack - this shouldn't happen this often...
+        # also, if the score board changes so it's only updated one team at a time, the 1 should become self.team.name
+        sections.pushSection("scoreBoard", 1)
 
     def submitAnswer(self, answerString, time):
         if not self.enabled:

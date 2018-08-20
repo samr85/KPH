@@ -8,16 +8,19 @@
 
 {%block extraheaders%}
 <link rel="stylesheet" type="text/css" href="static/score.css" />
+<script>
+    function updateScoreBoard(id, sortValue, data) {
+        //Score board just comes as 1 big blob, so most of this is irrelivent
+        if (data) {
+            $('#scoreBoard').html(data);
+        }
+    }
+    initialiseSection("scoreBoard", updateScoreBoard, []);
+</script>
 {%end%}
+
 {%block title%}Score{%end%}
 
 {%block contents %}
-
-    <div class="scoreList">
-    <pre>
-{{scoreBoard}}
-    </pre>
-    </div>
-
-
+    <div id="scoreBoard"></div>
 {%end%}

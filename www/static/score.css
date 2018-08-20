@@ -1,3 +1,4 @@
-#scoreHistory {
-    height: 500px;
+#scoreBoard {
+    white-space: pre;
+    font-family: monospace;
 }
