@@ -4,6 +4,8 @@ import scheduler
 from controller import CTX
 from commandRegistrar import handleCommand
 
+import texttable
+
 # This class is for a global state that anything specific to the hunt can access
 class HuntState:
     def __init__(self):
@@ -24,7 +26,7 @@ def initialise(reloading=False):
 
     # TODO: DISABLE FOR LIVE
     CTX.enableInsecure = False
-    CTX.admin.password = "Puzzling_Love"
+    CTX.admin.password = "1"
 
     if reloading:
         startHunt()
@@ -66,4 +68,14 @@ def metaCallback():
         if CTX.state.metaQuestion.id not in team.questionAnswers:
             team.notifyTeam("Meta puzzle unlocked automatically!", alert=True)
     CTX.enableQuestion(CTX.state.metaQuestion)
+    
+def renderScore():
+    questionList = CTX.questions.getNames()
+    teamScores = CTX.teams.getScoreList()
+
+    scoreBoard = texttable.Texttable()
+    scoreBoard.set_cols_width([10]*(len(questionList)+2))
+    scoreBoard.add_row(['team']+questionList+['score'])
+    scoreBoard.add_rows([[i.name]+i.fullScore+[i.score] for i in teamScores],header=False)
+    return scoreBoard.draw()
 

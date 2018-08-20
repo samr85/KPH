@@ -79,14 +79,14 @@ class Team:
         raise ErrorMessage("Invalid question: %s"%(questionId))
     
     def renderScore(self, fullScore):
-        scoreLine = ""
+        scoreLine = []
         for question in CTX.questions:
             if not(question.noScore):
                 #scoreLine += " "+question.name+" "
                 if question.id in fullScore.keys():
-                    scoreLine += fullScore[question.id]
+                    scoreLine += [fullScore[question.id]]
                 else:
-                    scoreLine += "x"
+                    scoreLine += ["x"]
         return scoreLine      
 
     def listQuestionIdVersions(self):
