@@ -4,6 +4,8 @@ import scheduler
 from controller import CTX
 from commandRegistrar import handleCommand
 
+import texttable
+
 # This class is for a global state that anything specific to the hunt can access
 class HuntState:
     def __init__(self):
@@ -23,7 +25,7 @@ def initialise(reloading=False):
     loadTeamList()
 
     # TODO: DISABLE FOR LIVE
-    CTX.enableInsecure = True
+    CTX.enableInsecure = False
     CTX.admin.password = "1"
 
     if reloading:
@@ -36,10 +38,10 @@ def loadQuestionList():
     import KPHQuestions
 
 def loadTeamList():
-    CTX.teams.createTeam("j", "j","Full Team Name")
-    CTX.teams.createTeam("c", "c")
-    CTX.teams.createTeam("t", "t")
-    CTX.teams.createTeam("a", "a")
+    CTX.teams.createTeam("apple",  "Talented_Ghost","Team Apple")
+    CTX.teams.createTeam("banana", "Quiet_Umbrella", "Team Banana")
+    CTX.teams.createTeam("tom",    "Easy_Week", "Tom's Team")
+    CTX.teams.createTeam("will",   "Wild_Kitten", "Will's Team")
 
 # Use @handleCommand if you want to be able to send any messages to this code from the browsers.
 @handleCommand("startHunt", adminRequired=True)
@@ -51,9 +53,9 @@ def startHunt():
             CTX.enableQuestion(question)
     #CTX.disableQuestion(question, CTX.teams[html.escape("<b>b'b")])
     #scheduler.runIn(6, finalPuzzleCallback)
-    scheduler.runIn(180, endHuntCallback)
-    scheduler.runIn(60, metaCallback)
-    scheduler.displayCountdown("Time remaining", 180)
+    scheduler.runIn(9000, endHuntCallback)
+    scheduler.runIn(5400, metaCallback)
+    scheduler.displayCountdown("Time remaining", 9000)
 
 def endHuntCallback():
     print("Hunt has finished!")
@@ -66,4 +68,14 @@ def metaCallback():
         if CTX.state.metaQuestion.id not in team.questionAnswers:
             team.notifyTeam("Meta puzzle unlocked automatically!", alert=True)
     CTX.enableQuestion(CTX.state.metaQuestion)
+    
+def renderScore():
+    questionList = CTX.questions.getNames()
+    teamScores = CTX.teams.getScoreList()
+
+    scoreBoard = texttable.Texttable()
+    scoreBoard.set_cols_width([10]*(len(questionList)+2))
+    scoreBoard.add_row(['team']+questionList+['score'])
+    scoreBoard.add_rows([[i.name]+i.fullScore+[i.score] for i in teamScores],header=False)
+    return scoreBoard.draw()
 
