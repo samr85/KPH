@@ -41,10 +41,8 @@ def loadQuestionList():
     import KPHQuestions
 
 def loadTeamList():
-    CTX.teams.createTeam("apple",  "Talented_Ghost","Team Apple")
-    CTX.teams.createTeam("banana", "Quiet_Umbrella", "Team Banana")
-    CTX.teams.createTeam("tom",    "Easy_Week", "Tom's Team")
-    CTX.teams.createTeam("will",   "Wild_Kitten", "Will's Team")
+    CTX.teams.createTeam("apple",  "apple","Team Apple")
+    CTX.teams.createTeam("banana", "banana", "Team Banana")
 
 # Use @handleCommand if you want to be able to send any messages to this code from the browsers.
 @handleCommand("startHunt", adminRequired=True)
