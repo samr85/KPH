@@ -122,7 +122,7 @@ class TeamRequestHandler(RequestHandler):
 
 class TeamPage(TeamRequestHandler):
     def getTeam(self):
-        self.render("www\\teampage.html", answers=self.team.questionAnswers.values(), team=self.team)
+        self.render(os.path.join("www", "teampage.html"), answers=self.team.questionAnswers.values(), team=self.team)
 
 class AdminRequestHandler(RequestHandler):
     def get(self):
@@ -136,26 +136,26 @@ class AdminRequestHandler(RequestHandler):
 
 class AdminPage(AdminRequestHandler):
     def getAdmin(self):
-        self.render("www\\admin.html", CTX=CTX)
+        self.render(os.path.join("www", "admin.html"), CTX=CTX)
 
 class AdminTeamViewerPage(AdminRequestHandler):
     def getAdmin(self):
         teamName = self.get_argument("teamSelect", None)
         team = CTX.teams[teamName]
-        self.render("www\\adminTeamViewer.html", team=team)
+        self.render(os.path.join("www", "adminTeamViewer.html"), team=team)
 class AdminQuestionViewerPage(AdminRequestHandler):
     def getAdmin(self):
-        self.render("www\\adminQuestionViewer.html")
+        self.render(os.path.join("www", "adminQuestionViewer.html"))
 
 class ScorePage(RequestHandler):
     def get(self):
-        self.render("www\\score.html")
+        self.render(os.path.join("www", "score.html"))
 
 class Login(RequestHandler):
     def get(self):
         self.clear_cookie("team")
         self.clear_cookie("admin")
-        self.render("www\\login.html", Errors=[], CTX=CTX)
+        self.render(os.path.join("www", "login.html"), Errors=[], CTX=CTX)
 
     def post(self):
         errorMessages = []
@@ -169,7 +169,7 @@ class Login(RequestHandler):
                 # Was this an admin login?
                 if password == CTX.admin.password:
                     self.set_secure_cookie("admin", "1")
-                    self.redirect("\\admin")
+                    self.redirect("/admin")
                     return
                 raise ErrorMessage("Please specify a team")
 
@@ -177,18 +177,18 @@ class Login(RequestHandler):
             # Excepts an ErrorMessage on error
             CTX.teams.getTeam(teamName, password)
             self.set_secure_cookie("team", teamName)
-            self.redirect("\\teampage")
+            self.redirect("/teampage")
             return
 
         except ErrorMessage as ex:
             errorMessages.append(ex.message)
-        self.render("www\\login.html", Errors=errorMessages, CTX=CTX)
+        self.render(os.path.join("www", "login.html"), Errors=errorMessages, CTX=CTX)
 
 class TestLogin(RequestHandler):
     def get(self):
         self.clear_cookie("team")
         self.clear_cookie("admin")
-        self.render("www\\testLogin.html", getTeamQuickLogin=self.getTeamQuickLogin, Errors=[], CTX=CTX)
+        self.render(os.path.join("www", "testLogin.html"), getTeamQuickLogin=self.getTeamQuickLogin, Errors=[], CTX=CTX)
 
     @staticmethod
     def getTeamQuickLogin():
@@ -204,7 +204,7 @@ class TestLogin(RequestHandler):
                 teamName = html.escape(self.get_argument("QuickLogin"))
                 if teamName in CTX.teams:
                     self.set_secure_cookie("team", teamName)
-                    self.redirect("\\teampage")
+                    self.redirect("/teampage")
                     return
                 errorMessages.append("Unknown team: %s"%(teamName))
             elif self.get_argument("createTeam", None):
@@ -212,22 +212,22 @@ class TestLogin(RequestHandler):
                 # Excepts on error
                 messageHandler.sendDummyMessage("createTeam", [teamName])
                 self.set_secure_cookie("team", teamName)
-                self.redirect("\\teampage")
+                self.redirect("/teampage")
                 return
             elif self.get_argument("login", None):
                 teamName = html.escape(self.get_argument("teamName"))
                 if teamName in CTX.teams:
                     self.set_secure_cookie("team", teamName)
-                    self.redirect("\\teampage")
+                    self.redirect("/teampage")
                     return
                 errorMessages.append("Unknown team: %s"%(teamName))
             elif self.get_argument("admin", None):
                 self.set_secure_cookie("admin", "1")
-                self.redirect("\\admin")
+                self.redirect("/admin")
                 return
         except ErrorMessage as ex:
             errorMessages.append(ex.message)
-        self.render("www\\testLogin.html", getTeamQuickLogin=self.getTeamQuickLogin, Errors=errorMessages)
+        self.render(os.path.join("www", "testLogin.html"), getTeamQuickLogin=self.getTeamQuickLogin, Errors=errorMessages)
 
 def initialiseTornado():
     asyncio.set_event_loop(asyncio.new_event_loop())
@@ -245,8 +245,8 @@ def initilise():
     parser.add_argument("--reloadMessages", "-r", type=argparse.FileType("r"), help="Reload the messages from specified file")
     # Open mode of x means fail if the file already exists
     parser.add_argument("--messageFile", "-m", type=argparse.FileType("x"), nargs='?',
-                        default="messages\\%s.txt"%(datetime.datetime.now().strftime("%Y%m%dT%H%M%S")),
-                        help="Save messages to specified file.  Default: messages.%s.txt"%
+                        default=os.path.join("messages", "%s.txt"%(datetime.datetime.now().strftime("%Y%m%dT%H%M%S"))),
+                        help="Save messages to specified file.  Default: messages/%s.txt"%
                         (datetime.datetime.now().strftime("%Y%m%dT%H%M%S")))
     parser.add_argument("--port", "-p", type=int, default=9092, help="Port to listen on, default: 9092")
     args = parser.parse_args()
@@ -262,7 +262,7 @@ def initilise():
 
     settings = {
         "debug": True,
-        "static_path": os.path.join(os.path.dirname(__file__), "www\\static"),
+        "static_path": os.path.join(os.path.dirname(__file__), "www", "static"),
         "cookie_secret": "123",
         "autoreload": False
         }

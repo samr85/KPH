@@ -7,4 +7,4 @@ class ErrorMessage(Exception):
         self.message = message
 
 startTime = datetime.datetime.now()
-SECTION_LOADER = tornado.template.Loader("www/sections")
+SECTION_LOADER = tornado.template.Loader(os.path.join("www", "sections"))
