@@ -2,7 +2,7 @@
 <div id="answerQueue{{answer.id}}">
     Team: {{answer.team.name}}<br />
     Question: {{answer.question.name}}<br />
-    Submitted answer: {{answer.answer}}<br />
+    <b>Submitted answer: {{answer.answer}}</b><br />
     {%set answers = answer.question.answers %}
     Correct answers: {{", ".join(answers)}}<br />
     Previously submitted answers: {{", ".join(answer.previousAnswers)}} <br />
