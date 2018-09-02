@@ -17,7 +17,7 @@ sys.path.insert(0, "KPH")
 # This must be first
 from controller import CTX
 
-from globalItems import ErrorMessage, startTime
+from globalItems import ErrorMessage
 import messageHandler
 import commandRegistrar
 import huntSpecific
@@ -283,7 +283,7 @@ def initilise():
 
     startServer()
     import readline
-    import rlcompleter #pylint: disable=unused-variable
+    import rlcompleter #pylint: disable=unused-variable, possibly-unused-variable
     import code
     readline.parse_and_bind("tab: complete")
     code.interact(local=locals())

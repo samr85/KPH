@@ -12,7 +12,7 @@ from commandRegistrar import handleCommand
 from controller import CTX
 
 class Team:
-    def __init__(self, name, password, fullName = None):
+    def __init__(self, name, password, fullName=None):
         self.name = name
         self.fullName = fullName or name
         self.questionAnswers = {}
@@ -37,7 +37,7 @@ class Team:
             raise ErrorMessage("Team does not have access to question: %s"%(questionId))
         answerItem = self.questionAnswers[questionId]
         answerString = html.unescape(answerString)
-        answerItem.submitAnswer(re.sub('\W+', '', answerString), time)
+        answerItem.submitAnswer(re.sub(r'\W+', '', answerString), time)
 
     def requestHint(self, questionId):
         if questionId not in self.questionAnswers:
@@ -48,15 +48,15 @@ class Team:
         score = 0
         scoreHist = dict()
         lastScoreTime = datetime.datetime.now()
-        for id, answer in self.questionAnswers.items():
+        for qId, answer in self.questionAnswers.items():
             thisScore = answer.getScore()
             if thisScore:
                 score += thisScore
                 if answer.answeredTime < lastScoreTime:
                     lastScoreTime = answer.answeredTime
-                scoreHist[id] = str(thisScore)
-            else: 
-                scoreHist[id] = '0'
+                scoreHist[qId] = str(thisScore)
+            else:
+                scoreHist[qId] = '0'
         score -= self.penalty
         return lastScoreTime, score, self.renderScore(scoreHist)
 
@@ -77,7 +77,7 @@ class Team:
         if questionId in self.questionAnswers:
             return self.questionAnswers[questionId].renderQuestion(admin)
         raise ErrorMessage("Invalid question: %s"%(questionId))
-    
+
     def renderScore(self, fullScore):
         scoreLine = []
         for question in CTX.questions:
@@ -87,13 +87,13 @@ class Team:
                     scoreLine += [fullScore[question.id]]
                 else:
                     scoreLine += ["x"]
-        return scoreLine      
+        return scoreLine
 
     def listQuestionIdVersions(self):
         versionList = []
         for answer in self.questionAnswers.values():
             versionList.append((answer.question.id, answer.version))
-        versionList.sort(key=lambda x:x[0])
+        versionList.sort(key=lambda x: x[0])
         return versionList
 
     def scoreVersion(self):
@@ -122,7 +122,7 @@ class TeamList:
     def __getitem__(self, key):
         return self.getTeam(key)
 
-    def createTeam(self, name, password, fullName = None):
+    def createTeam(self, name, password, fullName=None):
         """ Make a new team """
         with self.lock:
             name = html.escape(name)

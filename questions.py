@@ -109,9 +109,9 @@ class QuestionList:
         return self.questionList.__len__()
     def __getitem__(self, key):
         return self.questionList.__getitem__(key)
-    
+
     def getNames(self):
-        return [question.name for question in self.questionList.values() if not(question.noScore)]
+        return [question.name for question in self.questionList.values() if not question.noScore]
 
 def registerQuestion(question):
     return QuestionList.registerQuestion(question)

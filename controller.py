@@ -32,7 +32,7 @@ class HuntContext:
             messageDict = json.loads(line)
             if "team" in messageDict:
                 try:
-                    team = CTX.teams[messageDict["team"]]
+                    team = self.teams[messageDict["team"]]
                 except ErrorMessage:
                     team = None
                     print("Invalid team in message file: %s" % (messageDict["team"]))
