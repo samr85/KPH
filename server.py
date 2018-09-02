@@ -64,12 +64,10 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             messageHandler.handleMessage(self, message)
         except ErrorMessage as ex:
             errMsg = "Error: %s"%(ex.message)
-            self.write_message(errMsg)
             self.write_message("alert %s"%(base64.b64encode(errMsg.encode()).decode()))
         except UnicodeError:
             print('ERROR: Rx message with invalid unicode')
             errMsg = "Error: invalid characters in message"
-            self.write_message(errMsg)
             self.write_message("alert %s"%(base64.b64encode(errMsg.encode()).decode()))
             return
 

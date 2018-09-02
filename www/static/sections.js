@@ -126,7 +126,12 @@ function updateSectionHandler(msg)
     section.update(sortValue, contents);
 }
 
-function sortCallback(a, b) { return $(a).data('sort') > $(b).data('sort'); }
+function sortCallback(a, b) {
+    if ($(a).data('sort') > $(b).data('sort')) {
+        return 1;
+    }
+    return -1;
+}
 
 function standardSection(holderName, modifySectionCallback = undefined) {
     var sectionName = holderName + "Section";
