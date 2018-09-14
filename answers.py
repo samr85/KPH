@@ -123,9 +123,7 @@ class Answer:
         if not self.correct():
             if len(self.question.hints) != 0 and self.hintCount < 1:
                 CTX.admin.messageAdmin("Team %s requested a hint for %s"%(self.team.name, self.question.name))
-                self.hintCount = 1
-            else:
-                self.hintCount = len(self.question.hints)
+            self.hintCount = max(0,len(self.question.hints)-1)
             
             self.update()
 
