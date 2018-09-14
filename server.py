@@ -148,6 +148,10 @@ class AdminQuestionViewerPage(AdminRequestHandler):
 class ScorePage(RequestHandler):
     def get(self):
         self.render(os.path.join("www", "score.html"))
+        
+class TimerPage(RequestHandler):
+    def get(self):
+        self.render(os.path.join("www", "timer.html"))
 
 class Login(RequestHandler):
     def get(self):
@@ -271,7 +275,8 @@ def initilise():
         (r"/admin", AdminPage),
         (r"/adminTeamViewer", AdminTeamViewerPage),
         (r"/adminQuestionViewer", AdminQuestionViewerPage),
-        (r"/score", ScorePage)
+        (r"/scorescore", ScorePage),
+        (r"/timer", TimerPage)
         ]
     if CTX.enableInsecure:
         pageList.append((r"/testLogin", TestLogin))

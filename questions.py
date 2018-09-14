@@ -82,6 +82,7 @@ class RoundHeading(Question):
         super().__init__()
         self.htmlTemplate = "RoundHeading.html"
         self.score = 0
+        self.noScore = True
         self.htmlClasses.append("roundHeading")
 
 class RoundQuestion(Question):

@@ -56,7 +56,7 @@ class Team:
                     lastScoreTime = answer.answeredTime
                 scoreHist[qId] = str(thisScore)
             else:
-                scoreHist[qId] = '0'
+                scoreHist[qId] = ''
         score -= self.penalty
         return lastScoreTime, score, self.renderScore(scoreHist)
 
@@ -86,7 +86,7 @@ class Team:
                 if question.id in fullScore.keys():
                     scoreLine += [fullScore[question.id]]
                 else:
-                    scoreLine += ["x"]
+                    scoreLine += [""]
         return scoreLine
 
     def listQuestionIdVersions(self):
