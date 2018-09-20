@@ -3,7 +3,7 @@
 
 <div class="questionContainer {{" ".join(question.htmlClasses)}}">
     <div class="question{%if not answer.enabled%} questionDisabled{%end%}">
-        <div class="questionName">Question: {{question.name}}</div>
+        <div class="questionName">Puzzle: {{question.name}}</div>
         {%if question.question%}
         <div class="questionDescription">{{question.question}}</div>
         {%end%}
