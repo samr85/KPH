@@ -63,7 +63,7 @@ class Question:
 
     def submitAnswer(self, answer):
         """ Overload if you want something special to happen when an answer is submitted """
-        answer.team.notifyTeam('Answer "%s" submitted for question "%s"'%(answer.answer, self.name))
+        answer.team.notifyTeam('Answer "%s" submitted for puzzle "%s"'%(answer.answer, self.name))
 
     def submissionCheck(self, answer, answerString, currentTime):
         """ Overload this if there might be a special reason that answers (or a specific answer) can't be submitted.  Return with a string to refuse submission """
@@ -72,9 +72,11 @@ class Question:
     def markNotification(self, answer):
         """ Overload this to change what messages (if any!) are sent to the user when the questions is marked """
         if answer.correct():
-            answer.team.notifyTeam('Correct: Answer "%s" to question "%s" accepted'%(answer.answer, self.name), alert=True)
+            answer.team.notifyTeam('Correct: Answer "%s" to puzzle "%s" accepted'%(answer.answer, self.name), alert=True)
+            if answer.hintCount<1:
+                CTX.admin.messageAdmin("%s needs a meta piece for %s"%(answer.team.name, self.name))
         else:
-            answer.team.notifyTeam('Incorrect: Answer "%s" to question "%s" rejected'%(answer.answer, self.name), alert=True)
+            answer.team.notifyTeam('Incorrect: Answer "%s" to puzzle "%s" rejected'%(answer.answer, self.name), alert=True)
 
 class RoundHeading(Question):
     roundName = ""

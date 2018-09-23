@@ -111,10 +111,10 @@ class Answer:
             raise ErrorMessage("Attempting to request a hint for an already correct question")
         if self.hintCount < len(self.question.hints):
             self.hintCount += 1
-            self.team.notifyTeam("Hint for question %s unlocked"%(self.question.name))
+            self.team.notifyTeam("Hint for puzzle %s unlocked"%(self.question.name))
             self.update()
             if self.hintCount == 1:
-                CTX.admin.messageAdmin("%s requested a hint for %s"%(self.team.name, self.question.name))
+                CTX.admin.messageAdmin("%s needs a meta piece for %s"%(self.team.name, self.question.name))
         else:
             raise ErrorMessage("All hints already requested")
 
@@ -122,7 +122,7 @@ class Answer:
         """ Admin function to mark all hints as requested """
         if not self.correct():
             if len(self.question.hints) != 0 and self.hintCount < 1:
-                CTX.admin.messageAdmin("%s requested a hint for %s"%(self.team.name, self.question.name))
+                CTX.admin.messageAdmin("%s needs a meta piece for %s"%(self.team.name, self.question.name))
             self.hintCount = max(0,len(self.question.hints)-1)
             
             self.update()
