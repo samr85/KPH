@@ -1,4 +1,5 @@
 import html
+import datetime
 
 import scheduler
 from controller import CTX
@@ -29,16 +30,13 @@ def initialise(reloading=False):
     CTX.enableInsecure = False
     CTX.admin.password = "1"
 
-    if reloading:
-        startHunt()
-    else:
-        for question in CTX.questions:
-            if question.unlockOn == "initial":
-                CTX.enableQuestion(question)
+    for question in CTX.questions:
+        if question.unlockOn == "initial":
+            CTX.enableQuestion(question)
 
 # Dummy examples of roughly what we might want this file to look like
 def loadQuestionList():
-    import KPHQuestions
+    import KPHQuestions_sanitized
 
 def loadTeamList():
     CTX.teams.createTeam("apple",  "apple","Team Apple")
@@ -46,13 +44,21 @@ def loadTeamList():
 
 # Use @handleCommand if you want to be able to send any messages to this code from the browsers.
 @handleCommand("startHunt", adminRequired=True)
-def startHunt(_server = None, _messageList = None, _time = None):
+def startHunt(_server = None, _messageList = None, time = None):
     CTX.state.huntStarted = True
     print("Hunt is starting!!!")
 
-    scheduler.runIn(9000, endHuntCallback)
-    scheduler.runIn(5400, metaCallback)
-    scheduler.displayCountdown("Time remaining", 9000)
+    if time:
+        timeOffset = (datetime.datetime.now() - time).total_seconds()
+    else:
+        timeOffset = 0
+
+    scheduler.runIn(9000 - timeOffset, endHuntCallback)
+    if 5400 - timeOffset > 0:
+        scheduler.runIn(5400 - timeOffset, metaCallback)
+    else:
+        print("WARNING: Meta timeout already hit, should unlock now if it's not already been done")
+    scheduler.displayCountdown("Time remaining", 9000 - timeOffset)
 
 def endHuntCallback():
     print("Hunt has finished!")
