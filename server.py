@@ -257,8 +257,10 @@ def initilise():
     if args.reloadMessages:
         import scheduler
         with scheduler.PUZZLE_SCHEDULER.reloading():
+            CTX.reloading = True
             huntSpecific.initialise(reloading=True)
             CTX.importMessages(args.reloadMessages)
+            CTX.reloading = False
     else:
         huntSpecific.initialise(reloading=False)
 

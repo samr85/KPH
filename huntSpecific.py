@@ -1,4 +1,5 @@
 import html
+import datetime
 
 import scheduler
 from controller import CTX
@@ -29,12 +30,9 @@ def initialise(reloading=False):
     CTX.enableInsecure = False
     CTX.admin.password = "complete chalk"
 
-    if reloading:
-        startHunt()
-    else:
-        for question in CTX.questions:
-            if question.unlockOn == "initial":
-                CTX.enableQuestion(question)
+    for question in CTX.questions:
+        if question.unlockOn == "initial":
+            CTX.enableQuestion(question)
 
 # Dummy examples of roughly what we might want this file to look like
 def loadQuestionList():
@@ -69,19 +67,29 @@ def loadTeamList():
 
 # Use @handleCommand if you want to be able to send any messages to this code from the browsers.
 @handleCommand("startHunt", adminRequired=True)
-def startHunt(_server = None, _messageList = None, _time = None):
+def startHunt(_server = None, _messageList = None, time = None):
     CTX.state.huntStarted = True
     print("Hunt is starting!!!")
     
-    scheduler.runIn(1800, announceHoursCallback, args=([2]))
-    scheduler.runIn(5400, announceHoursCallback, args=([1]))
-    scheduler.runIn(7200, announceMinutesCallback, args=([30]))
-    scheduler.runIn(7800, announceMinutesCallback, args=([20]))
-    scheduler.runIn(8400, announceMinutesCallback, args=([10]))
-    scheduler.runIn(9000, endHuntCallback)
-    scheduler.runIn(5400, metaCallback)
-    scheduler.displayCountdown("Time remaining", 9000)
+    if time:
+        timeOffset = (datetime.datetime.now() - time).total_seconds()
+    else:
+        timeOffset = 0
+    if 1800 - timeOffset > 0:
+        scheduler.runIn(1800 - timeOffset, announceHoursCallback, args=([2]))
+    if 5400 - timeOffset > 0:
+        
+        scheduler.runIn(5400 - timeOffset, announceHoursCallback, args=([1]))
+        scheduler.runIn(7200 - timeOffset, announceMinutesCallback, args=([30]))
+        scheduler.runIn(7800 - timeOffset, announceMinutesCallback, args=([20]))
+        scheduler.runIn(8400 - timeOffset, announceMinutesCallback, args=([10]))
+        scheduler.runIn(5400 - timeOffset, metaCallback)
+    else:
+        print("WARNING: Meta timeout already hit, should unlock now if it's not already been done")
+   
+    scheduler.runIn(9000 - timeOffset, endHuntCallback)
 
+    scheduler.displayCountdown("Time remaining", 9000 - timeOffset)
 
 def endHuntCallback():
     print("Hunt has finished!")
@@ -102,7 +110,6 @@ def announceHoursCallback(hours):
             team.notifyTeam("Announcement: %d hour remaining!"% hours, alert=True)
     
 def announceMinutesCallback(minutes):
-
     for team in CTX.teams:
         team.notifyTeam("Announcement: %d minutes remaining!"% minutes, alert=True)
 

@@ -16,7 +16,7 @@ class AdminList:
     def messageAdmin(self, message, alert=False):
         self.messages.append(message)
         sections.pushSection("message", len(self.messages) - 1, "admin")
-        if alert:
+        if alert and not CTX.reloading:
             for client in self.messagingClients:
                 client.write_message("alert %s"%(base64.b64encode(message.encode()).decode()))
 
