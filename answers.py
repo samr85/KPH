@@ -119,11 +119,11 @@ class Answer:
             raise ErrorMessage("All hints already requested")
 
     def requestAllHints(self):
-        """ Admin function to mark all hints as requested """
+        """ Admin function to mark all hint1s as requested """
         if not self.correct():
             if len(self.question.hints) != 0 and self.hintCount < 1:
                 CTX.admin.messageAdmin("Team %s requested a hint for %s"%(self.team.name, self.question.name))
-            self.hintCount = max(0,len(self.question.hints)-1)
+            self.hintCount = max(0,len(self.question.hints)-1, self.hintCount)
             
             self.update()
 
