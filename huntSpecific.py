@@ -1,4 +1,5 @@
 import html
+import datetime
 
 import scheduler
 from controller import CTX
@@ -27,32 +28,68 @@ def initialise(reloading=False):
 
     # TODO: DISABLE FOR LIVE
     CTX.enableInsecure = False
-    CTX.admin.password = "1"
+    CTX.admin.password = "complete chalk"
 
-    if reloading:
-        startHunt()
-    else:
-        for question in CTX.questions:
-            if question.unlockOn == "initial":
-                CTX.enableQuestion(question)
+    for question in CTX.questions:
+        if question.unlockOn == "initial":
+            CTX.enableQuestion(question)
 
 # Dummy examples of roughly what we might want this file to look like
 def loadQuestionList():
     import KPHQuestions
 
 def loadTeamList():
-    CTX.teams.createTeam("apple",  "apple","Team Apple")
-    CTX.teams.createTeam("banana", "banana", "Team Banana")
+    CTX.teams.createTeam("103",          "satisfying scissors", "103")
+    CTX.teams.createTeam("XMES",         "distinct truck", "Merry XMES")
+    CTX.teams.createTeam("nottoblame",   "lyrical frog", "We are not to blame for our lack of gender diversity, she dropped out") 
+    CTX.teams.createTeam('Diversity',    "quack channel", '"Diversity"')
+    CTX.teams.createTeam("Todd Smith",   "worthless key", "Todd Smith Classics")
+    CTX.teams.createTeam("Pirate",       "best engine", "Pirate offering a chair? (2,4)")
+    CTX.teams.createTeam("BrRocCraLei",  "lively fold", "BrRocCraLei")
+    CTX.teams.createTeam("Red Lorry",    "supreme zoo", "Red Lorry Yellow Jacob")
+    CTX.teams.createTeam("Singular",     "utopian cent", "A Singular Hope")
+    CTX.teams.createTeam("Black Swan",   "deserted berry", "Black Swan Masochists")
+    CTX.teams.createTeam("Team11",       "waiting fireman", "Team11")
+    CTX.teams.createTeam("MERJ",  "unruly mind", "MERJ Lanes")
+    CTX.teams.createTeam("Non Bonds",  "sombre shop", "The 4 Non Bonds")
+    CTX.teams.createTeam("F-B Good",  "ritzy debt", "Finger-Bricking Good")
+    CTX.teams.createTeam("TBD",  "bustling arm", "TBD")
+    CTX.teams.createTeam("Team16",  "misty business", "Team16")
+    CTX.teams.createTeam("Cutting",  "supreme summer", "Here for the cutting and sticking")
+    CTX.teams.createTeam("Hmm",  "callous drink", "Hmm")
+    CTX.teams.createTeam("Mistake Not",  "zesty business", "Mistake Not...")
+    CTX.teams.createTeam("HACHing",  "general balloon", "HACHing cough")
+    CTX.teams.createTeam("Bad Rubbish",  "waiting insect", "Make Good Use of Bad Rubbish")
+    CTX.teams.createTeam("Erbal",  "smart degree", "Erbal Tom-ay-toes % Herbal Tom-ah-toes")
+    CTX.teams.createTeam("order66.exe",  "languid hope", "order66.exe")
+    
+      
 
 # Use @handleCommand if you want to be able to send any messages to this code from the browsers.
 @handleCommand("startHunt", adminRequired=True)
-def startHunt(_server = None, _messageList = None, _time = None):
+def startHunt(_server = None, _messageList = None, time = None):
     CTX.state.huntStarted = True
     print("Hunt is starting!!!")
+    
+    if time:
+        timeOffset = (datetime.datetime.now() - time).total_seconds()
+    else:
+        timeOffset = 0
+    if 1800 - timeOffset > 0:
+        scheduler.runIn(1800 - timeOffset, announceHoursCallback, args=([2]))
+    if 5400 - timeOffset > 0:
+        
+        scheduler.runIn(5400 - timeOffset, announceHoursCallback, args=([1]))
+        scheduler.runIn(7200 - timeOffset, announceMinutesCallback, args=([30]))
+        scheduler.runIn(7800 - timeOffset, announceMinutesCallback, args=([20]))
+        scheduler.runIn(8400 - timeOffset, announceMinutesCallback, args=([10]))
+        scheduler.runIn(5400 - timeOffset, metaCallback)
+    else:
+        print("WARNING: Meta timeout already hit, should unlock now if it's not already been done")
+   
+    scheduler.runIn(9000 - timeOffset, endHuntCallback)
 
-    scheduler.runIn(9000, endHuntCallback)
-    scheduler.runIn(5400, metaCallback)
-    scheduler.displayCountdown("Time remaining", 9000)
+    scheduler.displayCountdown("Time remaining", 9000 - timeOffset)
 
 def endHuntCallback():
     print("Hunt has finished!")
@@ -64,6 +101,17 @@ def metaCallback():
         if CTX.state.metaQuestion.id not in team.questionAnswers:
             team.notifyTeam("Meta puzzle unlocked automatically!", alert=True)
     CTX.enableQuestion(CTX.state.metaQuestion)
+    
+def announceHoursCallback(hours):
+    for team in CTX.teams:
+        if hours > 1:
+            team.notifyTeam("Announcement: %d hours remaining!"% hours, alert=True)
+        elif hours == 1:
+            team.notifyTeam("Announcement: %d hour remaining!"% hours, alert=True)
+    
+def announceMinutesCallback(minutes):
+    for team in CTX.teams:
+        team.notifyTeam("Announcement: %d minutes remaining!"% minutes, alert=True)
 
 @registerSectionHandler("scoreBoard")
 class ScoreBoardHandler(SectionHandler):
@@ -81,8 +129,9 @@ def renderScore():
     teamScores = CTX.teams.getScoreList()
 
     scoreBoard = texttable.Texttable()
-    scoreBoard.set_cols_width([10]*(len(questionList)+2))
-    scoreBoard.add_row(['team']+questionList+['score'])
+    scoreBoard.set_cols_align(['l']+['r']*(len(questionList)+1))
+    scoreBoard.set_cols_width([11]+[10]*len(questionList)+[6])
+    scoreBoard.header(['Team Name']+questionList+['TOTAL SCORE'])
     scoreBoard.add_rows([[i.name]+i.fullScore+[i.score] for i in teamScores],header=False)
     return scoreBoard.draw()
 

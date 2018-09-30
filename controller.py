@@ -22,6 +22,7 @@ class HuntContext:
         self.newAnswer = answers.Answer
         self.messagingClients = messageHandler.MessagingClients()
         self.state = huntSpecific.HuntState()
+        self.reloading = False
 
         # Logging in with no passwords
         self.enableInsecure = False

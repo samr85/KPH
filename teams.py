@@ -28,7 +28,7 @@ class Team:
     def notifyTeam(self, message, alert=False):
         self.messages.append(message)
         sections.pushSection("message", len(self.messages) - 1, self)
-        if alert:
+        if alert and not CTX.reloading:
             for client in self.messagingClients:
                 client.write_message("alert %s"%(base64.b64encode(message.encode()).decode()))
 
@@ -106,7 +106,8 @@ def datetimeToJsString(dtime):
 
 class TeamScore:
     def __init__(self, team):
-        self.name = team.fullName
+        #self.name = team.fullName
+        self.name = team.name
         self.time, self.score, self.fullScore = team.getScore()
 
 class TeamList:

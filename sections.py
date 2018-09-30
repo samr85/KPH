@@ -35,6 +35,11 @@ class SectionHandler(abc.ABC):
             return [x for x in self.requestors if x.admin]
         return [x for x in self.requestors if x.team == requestorSubset]
 
+    def removeRequestor(self, requestor):
+        """Remove this requestor from our list, probably because it is invalid"""
+        if requestor in self.requestors:
+            self.requestors.remove(requestor)
+
     @abc.abstractmethod
     def requestUpdateList(self, requestor):
         # This function is called by the browser when it wants to know if there is any additional information to look up.
@@ -124,6 +129,9 @@ def pushSection(sectionName, sectionId, requestorSubset=None):
                                                                     base64.b64encode(sectionHtml).decode()))
         except tornado.websocket.WebSocketClosedError:
             print("Cannot send push for %s, socket closed"%(sectionName))
+            sectionReqHandler.removeRequestor(requestor)
+        except Exception as e:
+            print("Exception caught! %s"%(str(e)))
 
 @handleCommand("UpdateSectionListRequest", logMessage=False)
 def updateSectionListRequest(requestor, messageList, _time):
