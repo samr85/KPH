@@ -39,32 +39,10 @@ def loadQuestionList():
     import KPHQuestions
 
 def loadTeamList():
-    CTX.teams.createTeam("103",          "satisfying scissors", "103")
-    CTX.teams.createTeam("XMES",         "distinct truck", "Merry XMES")
-    CTX.teams.createTeam("nottoblame",   "lyrical frog", "We are not to blame for our lack of gender diversity, she dropped out") 
-    CTX.teams.createTeam('Diversity',    "quack channel", '"Diversity"')
-    CTX.teams.createTeam("Todd Smith",   "worthless key", "Todd Smith Classics")
-    CTX.teams.createTeam("Pirate",       "best engine", "Pirate offering a chair? (2,4)")
-    CTX.teams.createTeam("BrRocCraLei",  "lively fold", "BrRocCraLei")
-    CTX.teams.createTeam("Red Lorry",    "supreme zoo", "Red Lorry Yellow Jacob")
-    CTX.teams.createTeam("Singular",     "utopian cent", "A Singular Hope")
-    CTX.teams.createTeam("Black Swan",   "deserted berry", "Black Swan Masochists")
-    CTX.teams.createTeam("Team11",       "waiting fireman", "Team11")
-    CTX.teams.createTeam("MERJ",  "unruly mind", "MERJ Lanes")
-    CTX.teams.createTeam("Non Bonds",  "sombre shop", "The 4 Non Bonds")
-    CTX.teams.createTeam("F-B Good",  "ritzy debt", "Finger-Bricking Good")
-    CTX.teams.createTeam("TBD",  "bustling arm", "TBD")
-    CTX.teams.createTeam("Team16",  "misty business", "Team16")
-    CTX.teams.createTeam("Cutting",  "supreme summer", "Here for the cutting and sticking")
-    CTX.teams.createTeam("Hmm",  "callous drink", "Hmm")
-    CTX.teams.createTeam("Mistake Not",  "zesty business", "Mistake Not...")
-    CTX.teams.createTeam("HACHing",  "general balloon", "HACHing cough")
-    CTX.teams.createTeam("Bad Rubbish",  "waiting insect", "Make Good Use of Bad Rubbish")
-    CTX.teams.createTeam("Erbal",  "smart degree", "Erbal Tom-ay-toes % Herbal Tom-ah-toes")
-    CTX.teams.createTeam("order66.exe",  "languid hope", "order66.exe")
-    
-      
-
+    import KPHTeams
+    for (team, teampw, longteam) in KPHTeams.teams:
+        CTX.teams.createTeam(team, teampw, longteam)
+ 
 # Use @handleCommand if you want to be able to send any messages to this code from the browsers.
 @handleCommand("startHunt", adminRequired=True)
 def startHunt(_server = None, _messageList = None, time = None):
