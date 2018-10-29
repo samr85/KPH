@@ -47,12 +47,12 @@ class Team:
     def getScore(self):
         score = 0
         scoreHist = dict()
-        lastScoreTime = datetime.datetime.now()
+        lastScoreTime = datetime.datetime.min
         for qId, answer in self.questionAnswers.items():
             thisScore = answer.getScore()
             if thisScore:
                 score += thisScore
-                if answer.answeredTime < lastScoreTime:
+                if answer.answeredTime > lastScoreTime:
                     lastScoreTime = answer.answeredTime
                 scoreHist[qId] = str(thisScore)
             else:
