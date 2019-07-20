@@ -42,6 +42,7 @@ def loadTeamList():
     import KPHTeams
     for (team, teampw, longteam) in KPHTeams.teams:
         CTX.teams.createTeam(team, teampw, longteam)
+    CTX.admin.password = KPHTeams.admin
  
 # Use @handleCommand if you want to be able to send any messages to this code from the browsers.
 @handleCommand("startHunt", adminRequired=True)
