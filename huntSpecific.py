@@ -28,7 +28,8 @@ def initialise(reloading=False):
 
     # TODO: DISABLE FOR LIVE
     CTX.enableInsecure = False
-    CTX.admin.password = "complete chalk"
+    if not CTX.admin.password:
+        CTX.admin.password = "complete chalk"
 
     for question in CTX.questions:
         if question.unlockOn == "initial":
