@@ -73,8 +73,6 @@ class Question:
         """ Overload this to change what messages (if any!) are sent to the user when the questions is marked """
         if answer.correct():
             answer.team.notifyTeam('Correct: Answer "%s" to puzzle "%s" accepted'%(answer.answer, self.name), alert=True)
-            if answer.hintCount<1:
-                CTX.admin.messageAdmin("%s needs a meta piece for %s"%(answer.team.name, self.name))
         else:
             answer.team.notifyTeam('Incorrect: Answer "%s" to puzzle "%s" rejected'%(answer.answer, self.name), alert=True)
 
