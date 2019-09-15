@@ -55,21 +55,21 @@ def startHunt(_server = None, _messageList = None, time = None):
         timeOffset = (datetime.datetime.now() - time).total_seconds()
     else:
         timeOffset = 0
-    if 2700 - timeOffset > 0:
-        scheduler.runIn(2700 - timeOffset, announceHoursCallback, args=([2]))
-    if 6300 - timeOffset > 0:
+    if 1800 - timeOffset > 0:
+        scheduler.runIn(1800 - timeOffset, announceHoursCallback, args=([2]))
+    if 5400 - timeOffset > 0:
         
-        scheduler.runIn(6300 - timeOffset, announceHoursCallback, args=([1]))
-        scheduler.runIn(8100 - timeOffset, announceMinutesCallback, args=([30]))
-        scheduler.runIn(8700 - timeOffset, announceMinutesCallback, args=([20]))
-        scheduler.runIn(9300 - timeOffset, announceMinutesCallback, args=([10]))
+        scheduler.runIn(5400 - timeOffset, announceHoursCallback, args=([1]))
+        scheduler.runIn(7200 - timeOffset, announceMinutesCallback, args=([30]))
+        scheduler.runIn(7800 - timeOffset, announceMinutesCallback, args=([20]))
+        scheduler.runIn(8400 - timeOffset, announceMinutesCallback, args=([10]))
         #scheduler.runIn(5400 - timeOffset, metaCallback)
     else:
         print("WARNING: Meta timeout already hit, should unlock now if it's not already been done")
    
-    scheduler.runIn(9900 - timeOffset, endHuntCallback)
+    scheduler.runIn(9000 - timeOffset, endHuntCallback)
 
-    scheduler.displayCountdown("Time remaining", 9900 - timeOffset)
+    scheduler.displayCountdown("Time remaining", 9000 - timeOffset)
 
 def endHuntCallback():
     print("Hunt has finished!")
