@@ -13,6 +13,8 @@ class Question:
     def __init__(self):
         # The name of the questions, is displayed to the user
         self.name = self.__class__.__name__.replace("_", " ")
+        # The short name, used when question needs shortening
+        self.shortname = ''.join([c for c in self.name if c.isupper()])
         # The text of the questions, displays to the user if set
         self.question = ""
         # How many points are scored for getting the question correct
@@ -113,6 +115,9 @@ class QuestionList:
 
     def getNames(self):
         return [question.name for question in self.questionList.values() if not question.noScore]
+    
+    def getShortNames(self):
+        return [question.shortname for question in self.questionList.values() if not question.noScore]
 
 def registerQuestion(question):
     return QuestionList.registerQuestion(question)

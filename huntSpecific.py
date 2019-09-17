@@ -105,13 +105,13 @@ def scoreVersion():
     return sum([team.scoreVersion() for team in CTX.teams])
 
 def renderScore():
-    questionList = CTX.questions.getNames()
+    questionList = CTX.questions.getShortNames()
     teamScores = CTX.teams.getScoreList()
 
     scoreBoard = texttable.Texttable()
     scoreBoard.set_cols_align(['l']+['r']*(len(questionList)+1))
     scoreBoard.set_cols_width([11]+[10]*len(questionList)+[6])
-    scoreBoard.header(['Team Name']+questionList+['TOTAL SCORE'])
+    scoreBoard.header(['Team Name']+questionList+['TOTAL'])
     scoreBoard.add_rows([[i.name]+i.fullScore+[i.score] for i in teamScores],header=False)
     return scoreBoard.draw()
 
