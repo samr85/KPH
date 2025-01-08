@@ -19,11 +19,11 @@ class Question:
         self.question = ""
         # How many points are scored for getting the question correct
         # 0 means force the admin to enter a score when marking it
-        self.score = 5
+        self.score = 3020
         # Display the score on the scoreboard?
         self.noScore = False
         # If the hint cost isn't specified for individual hints, they cost this much
-        self.defaultHintCost = 1
+        self.defaultHintCost = 19
         # List of the valid answers to the question
         self.answers = []
         # When the question unlocks.  This should be set to either another question,

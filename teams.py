@@ -45,6 +45,7 @@ class Team:
         self.questionAnswers[questionId].requestHint()
 
     def getScore(self):
+        medal_table_lookup = {3020:"G",3001:"S",3000:"B"}
         score = 0
         scoreHist = dict()
         lastScoreTime = datetime.datetime.min
@@ -54,7 +55,7 @@ class Team:
                 score += thisScore
                 if answer.answeredTime > lastScoreTime:
                     lastScoreTime = answer.answeredTime
-                scoreHist[qId] = str(thisScore)
+                scoreHist[qId] = medal_table_lookup[thisScore]
             else:
                 scoreHist[qId] = ''
         score -= self.penalty

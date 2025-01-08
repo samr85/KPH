@@ -18,7 +18,7 @@
             {%end%}
             {%if answer.canRequestHint() and not admin%}
             <div class="hintRequest">
-                <button onclick="requestHint('{{question.id}}', {{question.hints[answer.hintCount]["cost"]}});">Request Hint</button> (cost: {{question.hints[answer.hintCount]["cost"]}} points)
+                <button onclick="requestHint('{{question.id}}', {{question.hints[answer.hintCount]["cost"]}});">Request Hint</button> (cost: slightly less valuable medal)
             </div>
             {%end%}
         </div>

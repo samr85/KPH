@@ -24,7 +24,7 @@ function requestHint(question, value)
         return;
     }
 
-    $("<div id='hintRequest' title='Requesting hint'>Requesting this hint will reduce the value of this question by " + valueStr + ", are you sure?</div>").dialog({
+    $("<div id='hintRequest' title='Requesting hint'>Requesting this hint will reduce the value of this question are you sure?</div>").dialog({
         buttons: {
             "Yes": function () {
                 $(this).dialog("close");
