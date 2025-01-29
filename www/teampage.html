@@ -5,6 +5,8 @@
 {%block extraheaders%}
 <script src="static\teampage.js"></script>
 <link type="text/css" rel="stylesheet" href="static\team.css" />
+<link type="text/css" rel="stylesheet" href="static\2025\speedo\speedo.css" />
+<script src="static\2025\speedo\speedo.js"></script>
 {%end%}
 
 {%block contents %}
@@ -14,8 +16,12 @@
     <button onclick="messageAdmin();">Send message to admins</button>
 </form-->
 
+{% include 2025/speedo.html %}
+
 <div id="penaltyDiv"></div>
 
 <div id="questionList"></div>
+
+
 
 {%end%}

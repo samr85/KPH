@@ -5,6 +5,7 @@ import scheduler
 from controller import CTX
 from commandRegistrar import handleCommand
 from sections import SectionHandler, registerSectionHandler
+import speedo
 
 import texttable
 
@@ -50,26 +51,32 @@ def loadTeamList():
 def startHunt(_server = None, _messageList = None, time = None):
     CTX.state.huntStarted = True
     print("Hunt is starting!!!")
-    
+    today = datetime.datetime.today()
+    huntEndTime =  today.replace(hour = 22, minute = 30)
+
     if time:
         timeOffset = (datetime.datetime.now() - time).total_seconds()
     else:
         timeOffset = 0
     if 1800 - timeOffset > 0:
-        scheduler.runIn(1800 - timeOffset, announceHoursCallback, args=([2]))
+        scheduler.runAt(huntEndTime - datetime.timedelta(hours=2), announceHoursCallback)
     if 5400 - timeOffset > 0:
-        
-        scheduler.runIn(5400 - timeOffset, announceHoursCallback, args=([1]))
-        scheduler.runIn(7200 - timeOffset, announceMinutesCallback, args=([30]))
-        scheduler.runIn(7800 - timeOffset, announceMinutesCallback, args=([20]))
-        scheduler.runIn(8400 - timeOffset, announceMinutesCallback, args=([10]))
-        #scheduler.runIn(5400 - timeOffset, metaCallback)
+        scheduler.runAt(huntEndTime - datetime.timedelta(hours=1), announceHoursCallback, args=([1]))
+        scheduler.runAt(huntEndTime - datetime.timedelta(minutes=30), announceMinutesCallback, args=([30]))
+        scheduler.runAt(huntEndTime - datetime.timedelta(minutes=20), announceMinutesCallback, args=([20]))
+        scheduler.runAt(huntEndTime - datetime.timedelta(minutes=10), announceMinutesCallback, args=([10]))
+        scheduler.runIn(5284 - timeOffset, metaCallback)
     else:
         print("WARNING: Meta timeout already hit, should unlock now if it's not already been done")
-   
+
+    # For displaying the speedometer in the BTTF themed hunt
+    speedo.startSpeedo()  
+
+    # Countdown to send of hunt
     scheduler.runIn(9000 - timeOffset, endHuntCallback)
 
-    scheduler.displayCountdown("Time remaining", 9000 - timeOffset)
+    scheduler.displayCountdown("Time till lightening strikes (10:04pm)", timeAbsolute=huntEndTime)
+
 
 def endHuntCallback():
     print("Hunt has finished!")

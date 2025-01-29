@@ -1,0 +1,12 @@
+<div id="speedo">
+    {% for i in range(1,3) %}
+        {% for j in range(1,8) %}
+    <div class="absolute" id="speedo_{{i}}{{j}}">
+        <img src="static\2025\speedo\{{i}}{{j}}.png">
+    </div>
+        {% end %}
+    {% end %}
+    <div id="speedo_main">
+        <img src="static\2025\speedo\background.png">
+    </div>
+</div>

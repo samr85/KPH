@@ -62,7 +62,7 @@ class Answer:
         if msg:
             raise ErrorMessage(msg)
         if self.status == INCORRECT:
-            self.answer = answerString
+            self.answer = answerString.upper().replace(" ", "")
             CTX.answerQueue.queueAnswer(self)
             self.status = SUBMITTED
             if time:

@@ -1,0 +1,22 @@
+
+#speedo {
+    margin-left: auto;
+    margin-right: auto;
+    width: max-content;
+    max-width: 100%;
+}
+
+#speedo .absolute {
+    position: absolute;
+    /*I have no idea why this value is needed, but without it the base image starts resizing before the numbers*/
+    margin-right: 8px;
+}
+
+#speedo div {
+    display: none;
+}
+
+#speedo img {
+    width: 100%;
+    max-width: 350px;
+}
