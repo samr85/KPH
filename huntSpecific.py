@@ -52,7 +52,7 @@ def startHunt(_server = None, _messageList = None, time = None):
     CTX.state.huntStarted = True
     print("Hunt is starting!!!")
     today = datetime.datetime.today()
-    huntEndTime =  today.replace(hour = 22, minute = 30)
+    huntEndTime =  today.replace(hour = 22, minute = 4)
 
     if time:
         timeOffset = (datetime.datetime.now() - time).total_seconds()
