@@ -13,3 +13,5 @@ python3 server.py
 ```
 
 navigate to localhost:9092 in a web browser
+
+To access admin mode type the admin password into the login page without using a teamname. The admin password can be found/created in KPHTeams.py
